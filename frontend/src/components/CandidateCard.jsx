@@ -42,7 +42,7 @@ const CandidateCard = ({ candidate, onVote, isSelected }) => {
         className={`w-full py-4 rounded-2xl font-bold flex items-center justify-center space-x-2 transition-all ${
           isSelected 
           ? 'bg-primary text-white shadow-xl shadow-primary/30' 
-          : 'bg-white/5 hover:bg-white/10 text-white border border-white/10'
+          : 'bg-white/5 hover:bg-white/10 text-zinc-900 border border-white/10'
         }`}
       >
         <span>{isSelected ? 'Selected' : 'Select Candidate'}</span>

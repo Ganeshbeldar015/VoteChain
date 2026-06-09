@@ -49,7 +49,7 @@ const ElectionCard = ({ election }) => {
         <Link to={`/candidates/${id}`}>
           <motion.button
             whileTap={{ scale: 0.95 }}
-            className="w-full py-4 rounded-2xl bg-white/5 hover:bg-primary text-white font-bold transition-all duration-300 flex items-center justify-center space-x-2 group/btn"
+            className="w-full py-4 rounded-2xl bg-white/5 hover:bg-primary text-zinc-900 hover:text-white font-bold transition-all duration-300 flex items-center justify-center space-x-2 group/btn"
           >
             <span>{status === 'Active' ? 'Vote Now' : 'View Details'}</span>
             <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />

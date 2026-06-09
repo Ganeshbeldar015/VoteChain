@@ -49,7 +49,7 @@ const HeroSection = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-4 rounded-2xl font-bold flex items-center space-x-2 backdrop-blur-md transition-all w-full md:w-auto"
+              className="bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-900 px-8 py-4 rounded-2xl font-bold flex items-center space-x-2 backdrop-blur-md transition-all w-full md:w-auto"
             >
               <Play className="w-5 h-5 fill-current" />
               <span>How it Works</span>
