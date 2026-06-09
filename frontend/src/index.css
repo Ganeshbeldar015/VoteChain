@@ -134,3 +134,24 @@ select option {
 ::-webkit-scrollbar-thumb:hover {
   background: #D4D4D8;
 }
+
+/* High contrast status overrides for light mode */
+.text-green-400 {
+  color: #16A34A !important; /* green-600 */
+}
+.text-blue-400 {
+  color: #2563EB !important; /* blue-600 */
+}
+.text-red-400 {
+  color: #DC2626 !important; /* red-600 */
+}
+
+.bg-green-500\/10 {
+  background-color: rgba(22, 163, 74, 0.1) !important;
+}
+.bg-blue-500\/10 {
+  background-color: rgba(37, 99, 235, 0.1) !important;
+}
+.bg-red-500\/10 {
+  background-color: rgba(220, 38, 38, 0.1) !important;
+}

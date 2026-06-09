@@ -78,7 +78,7 @@ const HeroSection = () => {
                 </div>
              </div>
              {/* Floating UI Elements */}
-             <div className="absolute -top-6 -right-6 md:-right-12 glass-card p-4 rounded-2xl hidden md:block">
+             <div className="absolute -top-6 right-4 md:right-6 glass-card p-4 rounded-2xl hidden md:block">
                 <div className="flex items-center space-x-3">
                    <div className="w-10 h-10 bg-green-500/10 rounded-full flex items-center justify-center">
                       <div className="w-3 h-3 bg-green-500 rounded-full" />
@@ -89,7 +89,7 @@ const HeroSection = () => {
                    </div>
                 </div>
              </div>
-             <div className="absolute -bottom-6 -left-6 md:-left-12 glass-card p-4 rounded-2xl hidden md:block">
+             <div className="absolute -bottom-6 left-4 md:left-6 glass-card p-4 rounded-2xl hidden md:block">
                 <div className="flex items-center space-x-3">
                    <div className="w-10 h-10 bg-zinc-100 rounded-full flex items-center justify-center">
                       <Shield className="w-5 h-5 text-zinc-950" />
