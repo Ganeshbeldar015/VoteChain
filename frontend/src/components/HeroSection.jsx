@@ -66,11 +66,11 @@ const HeroSection = () => {
           className="mt-16 relative mx-auto max-w-5xl"
         >
           <div className="glass-card rounded-3xl p-4 md:p-8 relative">
-             <div className="aspect-video rounded-2xl bg-gradient-to-br from-zinc-50 to-zinc-100 flex items-center justify-center border border-zinc-200/80 overflow-hidden">
+             <div className="aspect-square md:aspect-video rounded-2xl bg-[#EDEDED] flex items-center justify-center border border-zinc-200/80 overflow-hidden">
                 <img 
                    src={blockchainVotingImg} 
                    alt="Secure Blockchain Voting System Illustration" 
-                   className="w-full h-full object-cover" 
+                   className="w-full h-full object-contain" 
                 />
              </div>
              {/* Floating UI Elements */}
