@@ -1,39 +1,98 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #7C3AED;
-  --color-secondary: #8B5CF6;
-  --color-accent: #A855F7;
-  --color-background: #0B1120;
-  --color-card: rgba(255, 255, 255, 0.05);
-  --color-muted: #94A3B8;
+  --color-primary: #18181B; /* zinc-900 (black/charcoal) */
+  --color-secondary: #27272A; /* zinc-800 */
+  --color-accent: #3F3F46; /* zinc-700 */
+  --color-background: #FFFFFF; /* white background */
+  --color-card: #FAFABA;
+  --color-muted: #71717A; /* zinc-500 */
   
   --background-image-gradient-radial: radial-gradient(var(--tw-gradient-stops));
   --background-image-gradient-conic: conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops));
 }
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: #0B1120;
-  color: #FFFFFF;
+  background-color: #FFFFFF;
+  color: #18181B; /* zinc-900 */
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
 }
 
+/* Glass card overrides for premium black and white light mode */
 .glass-card {
-  background: rgba(255, 255, 255, 0.05);
+  background: #FFFFFF !important;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid #E4E4E7 !important; /* zinc-200 */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04) !important;
+  color: #18181B !important;
 }
 
+.glass-card p, 
+.glass-card h1, 
+.glass-card h2, 
+.glass-card h3, 
+.glass-card h4, 
+.glass-card h5, 
+.glass-card h6, 
+.glass-card span:not(.text-white):not(.text-green-400):not(.text-blue-400):not(.text-red-400) {
+  color: #18181B !important;
+}
+
+/* Input, Textarea, Select override styles for light theme */
+input, textarea, select {
+  background-color: #F4F4F5 !important; /* zinc-100 */
+  border: 1px solid #E4E4E7 !important; /* zinc-200 */
+  color: #18181B !important;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: #18181B !important;
+  outline: none !important;
+  box-shadow: 0 0 0 1px #18181B !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #A1A1AA !important; /* zinc-400 */
+}
+
+select option {
+  background-color: #FFFFFF !important;
+  color: #18181B !important;
+}
+
+/* Background/border overrides for components using bg-white/5 etc. */
+.bg-white\/5 {
+  background-color: #F4F4F5 !important; /* zinc-100 */
+  color: #18181B !important;
+}
+
+.hover\:bg-white\/10:hover {
+  background-color: #E4E4E7 !important; /* zinc-200 */
+}
+
+.border-white\/5 {
+  border-color: #F4F4F5 !important;
+}
+
+.border-white\/10 {
+  border-color: #E4E4E7 !important;
+}
+
+.divide-white\/5 > * + * {
+  border-color: #E4E4E7 !important;
+}
+
+/* Gradient text to black and charcoal */
 .gradient-text {
-  background: linear-gradient(to right, #7C3AED, #A855F7);
+  background: linear-gradient(to right, #000000, #3F3F46);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -51,22 +110,23 @@ body {
   z-index: -1;
   margin: -1px;
   border-radius: inherit;
-  background: linear-gradient(to right, #7C3AED, #A855F7);
+  background: linear-gradient(to right, #000000, #3F3F46);
 }
 
+/* Scrollbar overrides */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0B1120;
+  background: #FFFFFF;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1E293B;
+  background: #E4E4E7;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #D4D4D8;
 }

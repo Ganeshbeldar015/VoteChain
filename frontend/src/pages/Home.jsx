@@ -63,6 +63,7 @@ const Home = () => {
         status: statusText,
         candidateCount: e.candidateIds.length,
         endsIn: endsIn
+      };
     });
 
   return (

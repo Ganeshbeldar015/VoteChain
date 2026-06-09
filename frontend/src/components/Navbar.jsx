@@ -40,7 +40,7 @@ const Navbar = () => {
           <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
             <Shield className="text-white w-6 h-6" />
           </div>
-          <span className="text-2xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+          <span className="text-2xl font-bold bg-gradient-to-r from-black to-zinc-600 bg-clip-text text-transparent">
             VoteChain
           </span>
         </Link>
@@ -62,7 +62,7 @@ const Navbar = () => {
         </div>
 
         {/* Mobile Menu Button */}
-        <button className="md:hidden text-white" onClick={() => setIsOpen(!isOpen)}>
+        <button className="md:hidden text-zinc-900" onClick={() => setIsOpen(!isOpen)}>
           {isOpen ? <X /> : <Menu />}
         </button>
       </div>
