@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Shield, ArrowRight, Play } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import blockchainVotingImg from '../assets/blockchain_voting.png';
 
 const HeroSection = () => {
   return (
@@ -66,16 +67,11 @@ const HeroSection = () => {
         >
           <div className="glass-card rounded-3xl p-4 md:p-8 relative">
              <div className="aspect-video rounded-2xl bg-gradient-to-br from-zinc-50 to-zinc-100 flex items-center justify-center border border-zinc-200/80 overflow-hidden">
-                {/* Abstract Blockchain Illustration */}
-                <div className="relative w-full h-full">
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-zinc-200/50 rounded-full blur-[60px]" />
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border border-zinc-900/10 rounded-full w-[300px] h-[300px] animate-[spin_12s_linear_infinite]" />
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border border-zinc-900/5 rounded-full w-[450px] h-[450px] animate-[spin_18s_linear_infinite_reverse]" />
-                    <div className="flex flex-col items-center justify-center h-full relative z-10">
-                       <Shield className="w-20 h-20 text-zinc-950 mb-4 drop-shadow-md" />
-                       <div className="h-1 w-32 bg-gradient-to-r from-transparent via-zinc-900 to-transparent" />
-                    </div>
-                </div>
+                <img 
+                   src={blockchainVotingImg} 
+                   alt="Secure Blockchain Voting System Illustration" 
+                   className="w-full h-full object-cover" 
+                />
              </div>
              {/* Floating UI Elements */}
              <div className="absolute -top-6 right-4 md:right-6 glass-card p-4 rounded-2xl hidden md:block">
