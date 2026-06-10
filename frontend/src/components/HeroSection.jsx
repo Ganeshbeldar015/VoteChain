@@ -128,21 +128,7 @@ const HeroSection = () => {
                 </Link>
               </div>
 
-              {/* Trust Indicators */}
-              <div className="grid grid-cols-3 gap-4 border-t border-white/10 pt-8 max-w-lg">
-                <div className="text-left">
-                  <h4 className="text-xl sm:text-2xl font-black text-zinc-900">99.9%</h4>
-                  <p className="text-xs text-muted font-medium mt-1">Immutability Score</p>
-                </div>
-                <div className="text-left border-l border-white/10 pl-4">
-                  <h4 className="text-xl sm:text-2xl font-black text-zinc-900">Base</h4>
-                  <p className="text-xs text-muted font-medium mt-1">Sepolia Active</p>
-                </div>
-                <div className="text-left border-l border-white/10 pl-4">
-                  <h4 className="text-xl sm:text-2xl font-black text-zinc-900">Zero</h4>
-                  <p className="text-xs text-muted font-medium mt-1">Gas Election Cost</p>
-                </div>
-              </div>
+
             </motion.div>
           </div>
 
@@ -337,26 +323,7 @@ const HeroSection = () => {
 
               </div>
 
-              {/* Decorative floating widgets */}
-              <div className="absolute -top-6 -right-6 bg-white border border-zinc-200 p-3.5 rounded-2xl shadow-xl hidden md:flex items-center space-x-3 animate-bounce" style={{ animationDuration: '4s' }}>
-                <div className="w-8 h-8 bg-green-100 rounded-xl flex items-center justify-center text-green-600">
-                  <Clock className="w-4.5 h-4.5" />
-                </div>
-                <div>
-                  <p className="text-[9px] text-muted font-bold uppercase tracking-wider">Avg Block Time</p>
-                  <p className="text-xs font-black text-zinc-900">2.0 seconds</p>
-                </div>
-              </div>
 
-              <div className="absolute -bottom-6 -left-6 bg-white border border-zinc-200 p-3.5 rounded-2xl shadow-xl hidden md:flex items-center space-x-3 animate-bounce" style={{ animationDuration: '6s' }}>
-                <div className="w-8 h-8 bg-zinc-100 rounded-xl flex items-center justify-center text-zinc-900">
-                  <Shield className="w-4.5 h-4.5" />
-                </div>
-                <div>
-                  <p className="text-[9px] text-muted font-bold uppercase tracking-wider">Cryptography</p>
-                  <p className="text-xs font-black text-zinc-900">End-to-End Verified</p>
-                </div>
-              </div>
 
             </motion.div>
           </div>
