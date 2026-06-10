@@ -76,9 +76,9 @@ const HeroSection = () => {
         <img 
           src="/blockchain-img.jpg" 
           alt="Blockchain background" 
-          className="w-full h-full object-cover opacity-[0.1]"
+          className="w-full h-full object-cover opacity-[0.18]"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/40 to-white" />
       </div>
       
       <div className="container mx-auto px-6 relative z-10">
