@@ -71,9 +71,15 @@ const HeroSection = () => {
 
   return (
     <section className="relative pt-36 pb-24 overflow-hidden bg-background">
-      {/* Dynamic Background Spheres */}
-      <div className="absolute top-10 left-10 w-96 h-96 bg-zinc-100 rounded-full blur-[120px] -z-10 animate-pulse" />
-      <div className="absolute bottom-20 right-10 w-96 h-96 bg-slate-100/80 rounded-full blur-[120px] -z-10 animate-pulse delay-1000" />
+      {/* Background Image with Gradient Overlay */}
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        <img 
+          src="https://www.icuerious.com/images/blockchain-img.jpg" 
+          alt="Blockchain background" 
+          className="w-full h-full object-cover opacity-[0.05] pointer-events-none"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background" />
+      </div>
       
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
