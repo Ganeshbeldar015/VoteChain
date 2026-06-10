@@ -70,7 +70,7 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden bg-background pt-28 pb-16">
+    <section className="relative min-h-screen flex items-center overflow-hidden bg-background pt-20 pb-12">
       {/* Background Image */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <img 
@@ -91,7 +91,7 @@ const HeroSection = () => {
               transition={{ duration: 0.6 }}
             >
               {/* Premium Badge */}
-              <div className="inline-flex items-center space-x-2 bg-white/5 border border-white/10 px-4 py-2 rounded-full mb-8 shadow-sm">
+              <div className="inline-flex items-center space-x-2 bg-white/5 border border-white/10 px-4 py-2 rounded-full mb-4 shadow-sm">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
@@ -102,16 +102,16 @@ const HeroSection = () => {
                 </span>
               </div>
               
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 tracking-tight leading-tight">
+              <h1 className="text-4xl sm:text-5xl md:text-[3.25rem] font-extrabold mb-4 tracking-tight leading-tight">
                 Secure, Transparent <br />
                 & <span className="gradient-text">Decentralized Voting</span>
               </h1>
               
-              <p className="text-base sm:text-lg text-muted max-w-xl mb-10 leading-relaxed">
+              <p className="text-base text-muted max-w-xl mb-6 leading-relaxed">
                 VoteChain implements absolute transparency in elections. Powered by zero-knowledge integrity, cryptographic keys, and permissionless audit logs.
               </p>
               
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-12">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-4">
                 <Link to="/elections">
                   <motion.button
                     whileHover={{ scale: 1.03 }}
