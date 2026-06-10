@@ -85,7 +85,13 @@ const Home = () => {
 
       {/* Featured Elections */}
       <section className="py-24 container mx-auto px-6">
-        <div className="flex justify-between items-end mb-12">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="flex justify-between items-end mb-12"
+        >
           <div>
             <h2 className="text-3xl md:text-5xl font-bold mb-4">Live <span className="gradient-text">Elections</span></h2>
             <p className="text-muted">Participate in ongoing democratic processes happening right now.</p>
@@ -99,16 +105,29 @@ const Home = () => {
               <ChevronDown className="w-4 h-4 -rotate-90" />
             </motion.button>
           </Link>
-        </div>
+        </motion.div>
         
         {activeElections.length === 0 ? (
-          <div className="text-center py-12 glass-card rounded-3xl p-8 max-w-xl mx-auto border border-white/5">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center py-12 glass-card rounded-3xl p-8 max-w-xl mx-auto border border-white/5"
+          >
              <p className="text-muted">No active or upcoming elections right now. Check back soon!</p>
-          </div>
+          </motion.div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {activeElections.map((election) => (
-              <ElectionCard key={election.id} election={election} />
+            {activeElections.map((election, index) => (
+              <motion.div 
+                key={election.id}
+                initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <ElectionCard election={election} />
+              </motion.div>
             ))}
           </div>
         )}
@@ -117,10 +136,25 @@ const Home = () => {
       {/* Testimonials */}
       <section className="py-24 bg-white/[0.02] border-y border-white/5">
         <div className="container mx-auto px-6">
-          <h2 className="text-3xl md:text-5xl font-bold text-center mb-16">Trusted by <span className="gradient-text">Voters</span></h2>
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-3xl md:text-5xl font-bold text-center mb-16"
+          >
+            Trusted by <span className="gradient-text">Voters</span>
+          </motion.h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="glass-card p-8 rounded-3xl">
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="glass-card p-8 rounded-3xl"
+              >
                 <div className="flex items-center space-x-4 mb-6">
                   <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center text-primary font-bold">
                     U{i}
@@ -133,7 +167,7 @@ const Home = () => {
                 <p className="text-muted italic leading-relaxed">
                   "The most seamless voting experience I've ever had. Knowing my vote is on the blockchain gives me incredible peace of mind."
                 </p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -142,7 +176,15 @@ const Home = () => {
       {/* FAQ Section */}
       <section className="py-24 container mx-auto px-6">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-5xl font-bold text-center mb-16">Frequently Asked <span className="gradient-text">Questions</span></h2>
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-3xl md:text-5xl font-bold text-center mb-16"
+          >
+            Frequently Asked <span className="gradient-text">Questions</span>
+          </motion.h2>
           <div className="space-y-4">
             {[
               { q: "How does blockchain voting work?", a: "Every vote is recorded as a transaction on a decentralized ledger, ensuring it cannot be changed or deleted." },
@@ -150,15 +192,23 @@ const Home = () => {
               { q: "Can votes be altered?", a: "No, the fundamental nature of blockchain prevents any alteration once a block is confirmed." },
               { q: "How secure is the platform?", a: "Our smart contracts undergo rigorous security audits and are protected by decentralized consensus." }
             ].map((faq, i) => (
-              <details key={i} className="glass-card rounded-2xl group transition-all duration-300">
-                <summary className="p-6 cursor-pointer font-bold flex justify-between items-center list-none">
-                  {faq.q}
-                  <ChevronDown className="w-5 h-5 group-open:rotate-180 transition-transform" />
-                </summary>
-                <div className="p-6 pt-0 text-muted leading-relaxed">
-                  {faq.a}
-                </div>
-              </details>
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.05 }}
+              >
+                <details className="glass-card rounded-2xl group transition-all duration-300">
+                  <summary className="p-6 cursor-pointer font-bold flex justify-between items-center list-none">
+                    {faq.q}
+                    <ChevronDown className="w-5 h-5 group-open:rotate-180 transition-transform" />
+                  </summary>
+                  <div className="p-6 pt-0 text-muted leading-relaxed">
+                    {faq.a}
+                  </div>
+                </details>
+              </motion.div>
             ))}
           </div>
         </div>

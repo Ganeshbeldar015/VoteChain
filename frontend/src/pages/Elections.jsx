@@ -104,8 +104,15 @@ const Elections = () => {
         layout
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
       >
-        {filteredElections.map((election) => (
-          <motion.div layout key={election.id}>
+        {filteredElections.map((election, index) => (
+          <motion.div 
+            layout 
+            key={election.id}
+            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.4, delay: (index % 3) * 0.08 }}
+          >
             <ElectionCard election={election} />
           </motion.div>
         ))}

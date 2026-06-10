@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { 
   ArrowRight, 
   Play, 
@@ -15,6 +15,10 @@ import { Link } from 'react-router-dom';
 const getUnixTimestamp = () => Math.floor(Date.now() / 1000);
 
 const HeroSection = () => {
+  const { scrollY } = useScroll();
+  const scale = useTransform(scrollY, [0, 600], [1, 1.15]);
+  const y = useTransform(scrollY, [0, 600], [0, 50]);
+
   // Simulator States
   const [candidates, setCandidates] = useState([
     { id: 1, name: "Alice Vance", party: "Decentralized Future", votes: 142, avatar: "AV" },
@@ -73,9 +77,10 @@ const HeroSection = () => {
     <section className="relative min-h-screen flex items-center overflow-hidden bg-background pt-20 pb-12">
       {/* Background Image */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <img 
+        <motion.img 
           src="/blockchain-img.jpg" 
           alt="Blockchain background" 
+          style={{ scale, y }}
           className="w-full h-full object-cover opacity-[0.18]"
         />
       </div>
