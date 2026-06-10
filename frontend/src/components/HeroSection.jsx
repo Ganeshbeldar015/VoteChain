@@ -74,7 +74,7 @@ const HeroSection = () => {
       {/* Background Image with Gradient Overlay */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <img 
-          src="https://www.icuerious.com/images/blockchain-img.jpg" 
+          src="/blockchain-img.jpg" 
           alt="Blockchain background" 
           className="w-full h-full object-cover opacity-[0.1]"
         />
