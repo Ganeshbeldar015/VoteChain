@@ -1,7 +1,10 @@
 import { ethers } from 'ethers';
 
 // Contract Address (Replace with deployed address)
-export const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS || "0xYourDeployedContractAddressHere";
+export const CONTRACT_ADDRESS = (import.meta.env.VITE_CONTRACT_ADDRESS || "0xYourDeployedContractAddressHere").replace(/['"]/g, '').trim();
+
+window.ethers = ethers;
+window.CONTRACT_ADDRESS = CONTRACT_ADDRESS;
 
 // Contract ABI
 export const CONTRACT_ABI = [
@@ -197,11 +200,29 @@ export const getAllElections = async () => {
 export const checkIsAdmin = async (account) => {
   try {
     if (!account) return false;
+    console.log("checkIsAdmin called with account:", account);
+    const provider = getProvider();
+    if (!provider) throw new Error("No provider found");
+
+    const network = await provider.getNetwork();
+    console.log("Browser network Chain ID:", network.chainId.toString());
+    console.log("Browser network Name:", network.name);
+
+    console.log("Contract address in use:", CONTRACT_ADDRESS);
+    const code = await provider.getCode(CONTRACT_ADDRESS);
+    console.log("Contract bytecode length in browser:", code.length);
+    if (code === "0x") {
+      console.warn("WARNING: The contract does not exist on the network MetaMask is currently connected to!");
+    }
+
     const contract = await getContract();
     const role = ethers.keccak256(ethers.toUtf8Bytes("ELECTION_MANAGER_ROLE"));
-    return await contract.hasRole(role, account);
+    console.log("ELECTION_MANAGER_ROLE hash:", role);
+    const hasRole = await contract.hasRole(role, account);
+    console.log(`Account ${account} has ELECTION_MANAGER_ROLE: ${hasRole}`);
+    return hasRole;
   } catch (error) {
-    console.error("Error checking admin status", error);
-    return false;
+    console.error("Error checking admin status:", error);
+    throw error;
   }
 };

@@ -20,6 +20,8 @@ const AdminDashboard = () => {
   const { 
     account, 
     isAdmin, 
+    authError,
+    networkDetails,
     elections, 
     createNewElection, 
     addNewCandidate, 

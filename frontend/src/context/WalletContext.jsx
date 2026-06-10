@@ -18,14 +18,39 @@ export const WalletProvider = ({ children }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [elections, setElections] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState(null);
+  const [networkDetails, setNetworkDetails] = useState({ chainId: 'Unknown', name: 'Unknown', codeLength: 0 });
 
   const loadBlockchainData = useCallback(async (currentAccount) => {
     try {
       setLoading(true);
-      const allElections = await getAllElections();
-      setElections(allElections);
+      setAuthError(null);
+      
+      let allElections = [];
+      try {
+        allElections = await getAllElections();
+        setElections(allElections);
+      } catch (err) {
+        console.warn("Failed to fetch elections:", err);
+      }
 
       if (currentAccount) {
+        // Try to fetch network details
+        try {
+          const provider = getProvider();
+          if (provider) {
+            const net = await provider.getNetwork();
+            const code = await provider.getCode(CONTRACT_ADDRESS);
+            setNetworkDetails({
+              chainId: net.chainId.toString(),
+              name: net.name,
+              codeLength: code.length
+            });
+          }
+        } catch (err) {
+          console.warn("Failed to retrieve network details:", err);
+        }
+
         const adminStatus = await checkIsAdmin(currentAccount);
         setIsAdmin(adminStatus);
       } else {
@@ -33,6 +58,8 @@ export const WalletProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("Error loading blockchain data:", error);
+      setAuthError(error.reason || error.message || String(error));
+      setIsAdmin(false);
     } finally {
       setLoading(false);
     }
@@ -180,6 +207,8 @@ export const WalletProvider = ({ children }) => {
     <WalletContext.Provider value={{
       account,
       isAdmin,
+      authError,
+      networkDetails,
       elections,
       loading,
       connect,
