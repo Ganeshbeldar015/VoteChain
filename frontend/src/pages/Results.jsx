@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { Trophy, Users, CheckCircle2, TrendingUp, Calendar, AlertCircle } from 'lucide-react';
@@ -13,20 +13,15 @@ const Results = () => {
   const [candidatesData, setCandidatesData] = useState([]);
   const [loadingResults, setLoadingResults] = useState(true);
 
-  // Set default selected election once loaded
-  useEffect(() => {
-    if (elections.length > 0 && !selectedElectionId) {
-      setSelectedElectionId(elections[0].id.toString());
-    }
-  }, [elections, selectedElectionId]);
+  const effectiveElectionId = selectedElectionId || (elections[0]?.id.toString() || '');
 
   // Fetch results when selection changes
   useEffect(() => {
     const fetchElectionResults = async () => {
-      if (!selectedElectionId) return;
+      if (!effectiveElectionId) return;
       try {
         setLoadingResults(true);
-        const results = await getResults(Number(selectedElectionId));
+        const results = await getResults(Number(effectiveElectionId));
         setCandidatesData(results.map((c, index) => ({
           name: c.name,
           votes: c.votes,
@@ -40,9 +35,9 @@ const Results = () => {
       }
     };
     fetchElectionResults();
-  }, [selectedElectionId]);
+  }, [effectiveElectionId]);
 
-  const selectedElection = elections.find(e => e.id.toString() === selectedElectionId);
+  const selectedElection = elections.find(e => e.id.toString() === effectiveElectionId);
 
   const totalVotes = candidatesData.reduce((acc, curr) => acc + curr.votes, 0);
   const winner = candidatesData.length > 0 && totalVotes > 0
@@ -72,7 +67,7 @@ const Results = () => {
             <Calendar className="w-3.5 h-3.5 mr-1" /> View Results For
           </label>
           <select
-            value={selectedElectionId}
+            value={effectiveElectionId}
             onChange={(e) => setSelectedElectionId(e.target.value)}
             className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:outline-none focus:border-primary/50 transition-all text-sm"
           >
@@ -157,7 +152,7 @@ const Results = () => {
                    ) : (
                      <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={candidatesData}>
-                           <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+                           <CartesianGrid strokeDasharray="3 3" stroke="#E4E4E7" vertical={false} />
                            <XAxis dataKey="name" stroke="#94A3B8" fontSize={12} tickLine={false} axisLine={false} />
                            <YAxis stroke="#94A3B8" fontSize={12} tickLine={false} axisLine={false} />
                            <Tooltip 

@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Users, 
   Vote, 
   Calendar, 
   Plus, 
-  Settings, 
   Shield, 
   BarChart3, 
   Play, 
@@ -20,8 +18,6 @@ const AdminDashboard = () => {
   const { 
     account, 
     isAdmin, 
-    authError,
-    networkDetails,
     elections, 
     createNewElection, 
     addNewCandidate, 
@@ -160,8 +156,8 @@ const AdminDashboard = () => {
       {message.text && (
         <div className={`fixed top-24 right-6 p-4 rounded-2xl shadow-2xl border backdrop-blur-md z-50 max-w-md transition-all ${
           message.isError 
-            ? 'bg-red-500/15 border-red-500/30 text-red-200' 
-            : 'bg-green-500/15 border-green-500/30 text-green-200'
+            ? 'bg-red-500/15 border-red-500/30 text-red-600' 
+            : 'bg-green-500/15 border-green-500/30 text-green-600'
         }`}>
           <p className="text-sm font-semibold">{message.text}</p>
         </div>
@@ -172,7 +168,7 @@ const AdminDashboard = () => {
           <h1 className="text-4xl font-bold mb-2">Admin <span className="gradient-text">Dashboard</span></h1>
           <p className="text-muted text-sm flex items-center">
             <Shield className="w-4 h-4 mr-2 text-primary" />
-            Connected Admin: <span className="font-mono text-white/80 ml-1">{account ? `${account.substring(0, 8)}...${account.substring(account.length - 6)}` : 'N/A'}</span>
+            Connected Admin: <span className="font-mono text-zinc-700 ml-1">{account ? `${account.substring(0, 8)}...${account.substring(account.length - 6)}` : 'N/A'}</span>
           </p>
         </div>
         <div className="flex space-x-4">
@@ -361,7 +357,7 @@ const AdminDashboard = () => {
             >
               <button 
                 onClick={() => setIsCreateModalOpen(false)}
-                className="absolute top-6 right-6 text-muted hover:text-white transition-colors"
+                className="absolute top-6 right-6 text-muted hover:text-primary transition-colors"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -445,7 +441,7 @@ const AdminDashboard = () => {
             >
               <button 
                 onClick={() => setIsAddCandidateModalOpen(false)}
-                className="absolute top-6 right-6 text-muted hover:text-white transition-colors"
+                className="absolute top-6 right-6 text-muted hover:text-primary transition-colors"
               >
                 <X className="w-6 h-6" />
               </button>

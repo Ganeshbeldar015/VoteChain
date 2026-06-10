@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Shield, 
   ArrowRight, 
   Play, 
   CheckCircle2, 
   Wallet, 
   Server, 
-  Clock, 
   RefreshCw, 
   Sparkles,
   Lock
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
+const getUnixTimestamp = () => Math.floor(Date.now() / 1000);
 
 const HeroSection = () => {
   // Simulator States
@@ -24,9 +24,11 @@ const HeroSection = () => {
   const [simState, setSimState] = useState('idle'); // 'idle', 'preparing', 'confirm-request', 'mining', 'success'
   const [txHash, setTxHash] = useState('');
   const [blockNum, setBlockNum] = useState(0);
+  const [simTimestamp, setSimTimestamp] = useState(0);
 
   const startSimulation = (candidateId) => {
     setVotedFor(candidateId);
+    setSimTimestamp(getUnixTimestamp());
     setSimState('preparing');
     
     setTimeout(() => {
@@ -243,7 +245,7 @@ const HeroSection = () => {
                             "action": "castVote",
                             "electionId": 1,
                             "candidateId": {votedFor},
-                            "timestamp": {Math.floor(Date.now()/1000)}
+                            "timestamp": {simTimestamp}
                             {" }"}
                           </div>
                         </div>

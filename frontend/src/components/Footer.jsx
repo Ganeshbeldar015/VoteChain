@@ -1,4 +1,3 @@
-import React from 'react';
 import { Shield, Github, Twitter, Linkedin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -58,8 +57,8 @@ const Footer = () => {
         <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-muted">
           <p>© 2026 VoteChain. All rights reserved.</p>
           <div className="flex space-x-6 mt-4 md:mt-0">
-            <a href="#" className="hover:text-white">Terms of Service</a>
-            <a href="#" className="hover:text-white">Cookie Policy</a>
+            <a href="#" className="hover:text-primary">Terms of Service</a>
+            <a href="#" className="hover:text-primary">Cookie Policy</a>
           </div>
         </div>
       </div>

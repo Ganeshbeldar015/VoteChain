@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { Wallet, UserCheck, Vote, BarChart3 } from 'lucide-react';
 

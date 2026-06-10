@@ -1,4 +1,3 @@
-import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 const ResultChart = ({ data }) => {
@@ -6,7 +5,7 @@ const ResultChart = ({ data }) => {
     <div className="h-80 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#E4E4E7" vertical={false} />
           <XAxis dataKey="name" stroke="#94A3B8" fontSize={12} tickLine={false} axisLine={false} />
           <YAxis stroke="#94A3B8" fontSize={12} tickLine={false} axisLine={false} />
           <Tooltip 

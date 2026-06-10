@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { 
   connectWallet, 
   checkIsAdmin, 
@@ -8,7 +9,9 @@ import {
   registerVoter as scRegisterVoter,
   startElection as scStartElection,
   endElection as scEndElection,
-  castVote as scCastVote
+  castVote as scCastVote,
+  getProvider,
+  CONTRACT_ADDRESS
 } from '../services/blockchain';
 
 const WalletContext = createContext();

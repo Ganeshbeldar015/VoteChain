@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import CandidateCard from '../components/CandidateCard';
@@ -60,7 +60,7 @@ const Candidates = () => {
     <div className="pt-32 pb-24 container mx-auto px-6">
       <button 
         onClick={() => navigate('/elections')}
-        className="flex items-center space-x-2 text-muted hover:text-white transition-colors mb-8 group"
+        className="flex items-center space-x-2 text-muted hover:text-primary transition-colors mb-8 group"
       >
         <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
         <span>Back to Elections</span>

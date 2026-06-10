@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, CheckCircle2, Loader2, AlertCircle, ArrowRight, Lock, Wallet } from 'lucide-react';
@@ -11,7 +11,7 @@ const VotePage = () => {
   const candidateId = searchParams.get('candidateId');
   const navigate = useNavigate();
 
-  const { voteForCandidate, loading } = useWallet();
+  const { voteForCandidate } = useWallet();
 
   const [status, setStatus] = useState('review'); // review, processing, success, error
   const [txHash, setTxHash] = useState(null);
@@ -237,7 +237,7 @@ const VotePage = () => {
               <div className="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-8">
                 <AlertCircle className="w-10 h-10 text-red-500" />
               </div>
-              <h2 className="text-3xl font-bold mb-4 font-extrabold text-red-200">Transaction Failed</h2>
+              <h2 className="text-3xl font-bold mb-4 font-extrabold text-red-600">Transaction Failed</h2>
               <p className="text-muted mb-10 max-w-sm mx-auto">
                 {errorMessage || "An error occurred while casting your vote. Make sure you are registered and have not already voted."}
               </p>

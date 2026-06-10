@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import ElectionCard from '../components/ElectionCard';
 import { Search, Filter } from 'lucide-react';
@@ -8,6 +8,7 @@ const Elections = () => {
   const { elections, loading } = useWallet();
   const [filter, setFilter] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
+  const [now] = useState(() => Math.floor(Date.now() / 1000));
 
   // Map blockchain elections to UI-compatible format
   const mappedElections = elections.map(e => {
@@ -15,8 +16,7 @@ const Elections = () => {
     if (e.status === 1) statusText = "Active";
     else if (e.status === 2) statusText = "Completed";
 
-    let endsIn = "";
-    const now = Math.floor(Date.now() / 1000);
+    let endsIn;
     if (e.status === 0) {
       const diff = e.startTime - now;
       if (diff > 86400) {
@@ -79,7 +79,7 @@ const Elections = () => {
               key={f}
               onClick={() => setFilter(f)}
               className={`px-6 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
-                filter === f ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted hover:text-white'
+                filter === f ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-muted hover:text-primary'
               }`}
             >
               {f}

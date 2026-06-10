@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import HeroSection from '../components/HeroSection';
 import FeatureCard from '../components/FeatureCard';
 import HowItWorks from '../components/HowItWorks';
@@ -38,6 +38,7 @@ const features = [
 
 const Home = () => {
   const { elections } = useWallet();
+  const [now] = useState(() => Math.floor(Date.now() / 1000));
 
   // Filter and limit to 3 active/upcoming elections
   const activeElections = elections
@@ -46,8 +47,7 @@ const Home = () => {
     .map(e => {
       let statusText = e.status === 1 ? "Active" : "Upcoming";
       
-      let endsIn = "";
-      const now = Math.floor(Date.now() / 1000);
+      let endsIn;
       if (e.status === 0) {
         const diff = e.startTime - now;
         endsIn = diff > 86400 ? `Starts in ${Math.round(diff / 86400)} days` : "Starting soon";

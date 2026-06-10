@@ -25,6 +25,11 @@ body {
   overflow-x: hidden;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Syne', sans-serif;
+  letter-spacing: -0.02em;
+}
+
 /* Glass card overrides for premium black and white light mode */
 .glass-card {
   background: #FFFFFF !important;
@@ -35,14 +40,14 @@ body {
   color: #18181B !important;
 }
 
-.glass-card p, 
-.glass-card h1, 
-.glass-card h2, 
-.glass-card h3, 
-.glass-card h4, 
-.glass-card h5, 
-.glass-card h6, 
-.glass-card span:not(.text-white):not(.text-green-400):not(.text-blue-400):not(.text-red-400) {
+.glass-card p:not([class*="text-"]), 
+.glass-card h1:not([class*="text-"]), 
+.glass-card h2:not([class*="text-"]), 
+.glass-card h3:not([class*="text-"]), 
+.glass-card h4:not([class*="text-"]), 
+.glass-card h5:not([class*="text-"]), 
+.glass-card h6:not([class*="text-"]), 
+.glass-card span:not([class*="text-"]):not(.text-white):not(.text-green-400):not(.text-blue-400):not(.text-red-400) {
   color: #18181B !important;
 }
 
@@ -71,7 +76,10 @@ select option {
 /* Background/border overrides for components using bg-white/5 etc. */
 .bg-white\/5 {
   background-color: #F4F4F5 !important; /* zinc-100 */
-  color: #18181B !important;
+}
+
+.bg-white\/\[0\.02\] {
+  background-color: rgba(24, 24, 27, 0.015) !important;
 }
 
 .hover\:bg-white\/10:hover {
@@ -83,7 +91,7 @@ select option {
 }
 
 .border-white\/5 {
-  border-color: #F4F4F5 !important;
+  border-color: #E4E4E7 !important; /* zinc-200 */
 }
 
 .border-white\/10 {
