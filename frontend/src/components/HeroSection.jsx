@@ -71,14 +71,13 @@ const HeroSection = () => {
 
   return (
     <section className="relative pt-36 pb-24 overflow-hidden bg-background">
-      {/* Background Image with Gradient Overlay */}
+      {/* Background Image */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <img 
           src="/blockchain-img.jpg" 
           alt="Blockchain background" 
           className="w-full h-full object-cover opacity-[0.18]"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/40 to-white" />
       </div>
       
       <div className="container mx-auto px-6 relative z-10">
