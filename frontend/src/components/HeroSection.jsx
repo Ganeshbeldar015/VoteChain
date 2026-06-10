@@ -72,16 +72,16 @@ const HeroSection = () => {
   return (
     <section className="relative pt-36 pb-24 overflow-hidden bg-background">
       {/* Background Image with Gradient Overlay */}
-      <div className="absolute inset-0 -z-10 overflow-hidden">
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <img 
           src="https://www.icuerious.com/images/blockchain-img.jpg" 
           alt="Blockchain background" 
-          className="w-full h-full object-cover opacity-[0.05] pointer-events-none"
+          className="w-full h-full object-cover opacity-[0.1]"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background" />
       </div>
       
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-6 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           
           {/* Left Column: Title, Intro and Live Metrics */}
