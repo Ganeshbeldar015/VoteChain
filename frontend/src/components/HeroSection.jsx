@@ -87,12 +87,26 @@ function HeroLiveTerminal() {
           ].sort((a, b) => a.block - b.block || a.txIndex - b.txIndex);
           
           if (mounted && allHistorical.length > 0) {
+            // Pre-fetch candidate maps for historical events
+            const eids = [...new Set(allHistorical.filter(item => item.type === 'VOTE').map(item => Number(item.log.args[0])))];
+            const candidateMaps = {};
+            await Promise.all(eids.map(async (eid) => {
+              try {
+                const list = await contract.getAllCandidates(eid);
+                candidateMaps[eid] = list;
+              } catch (e) {
+                console.warn(`Failed to fetch candidates for election #${eid} during scan`, e);
+              }
+            }));
+
             push(mkLog('BOOT', `Loaded ${allHistorical.length} historical logs:`));
             for (const item of allHistorical) {
               const ev = item.log;
               if (item.type === 'VOTE') {
                 const [eid, voter, candidateId] = ev.args;
-                push(mkLog('VOTE', `Vote → Candidate #${candidateId}`, `by ${short(voter)} · Election #${eid} (past event)`));
+                const candList = candidateMaps[Number(eid)] || [];
+                const candName = candList.find(c => Number(c.id) === Number(candidateId))?.name || `Candidate #${candidateId}`;
+                push(mkLog('VOTE', `Vote → ${candName}`, `by ${short(voter)} · Election #${eid} (past event)`));
               } else if (item.type === 'REGISTER') {
                 const [eid, voter] = ev.args;
                 push(mkLog('REGISTER', `Voter registered`, `${short(voter)} · Election #${eid} (past event)`));
@@ -113,7 +127,23 @@ function HeroLiveTerminal() {
           push(mkLog('WARN', "Historical scan skipped (RPC range restriction)."));
         }
 
-        contract.on('VoteCast',(eid,voter,cid)=>{ if(!mounted)return; push(mkLog('VOTE',`Vote → Candidate #${cid}`,`by ${short(voter)} · Election #${eid}`)); });
+        // Live event handler with candidate name resolution
+        const onVoteCast = async (eid, voter, cid) => {
+          if (!mounted) return;
+          let candName = `Candidate #${cid}`;
+          try {
+            const list = await contract.getAllCandidates(eid);
+            const found = list.find(c => Number(c.id) === Number(cid));
+            if (found && found.name) candName = found.name;
+          } catch (err) {
+            console.warn("Failed to resolve candidate name on live vote:", err);
+          }
+          if (mounted) {
+            push(mkLog('VOTE', `Vote → ${candName}`, `by ${short(voter)} · Election #${eid}`));
+          }
+        };
+
+        contract.on('VoteCast', onVoteCast);
         contract.on('VoterRegistered',(eid,voter)=>{ if(!mounted)return; push(mkLog('REGISTER',`Voter registered`,`${short(voter)} · Election #${eid}`)); });
         contract.on('ElectionStarted',(eid)=>{ if(!mounted)return; push(mkLog('ELECTION',`Election #${eid} STARTED`)); });
         contract.on('ElectionEnded',(eid)=>{ if(!mounted)return; push(mkLog('ELECTION',`Election #${eid} ENDED`)); });

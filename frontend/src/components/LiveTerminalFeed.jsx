@@ -136,14 +136,33 @@ export default function LiveTerminalFeed({ electionId, candidatesData = [] }) {
           ].sort((a, b) => a.block - b.block || a.txIndex - b.txIndex);
           
           if (mounted && allHistorical.length > 0) {
+            // Pre-fetch candidate maps for historical events
+            const eids = [...new Set(allHistorical.filter(item => item.type === 'VOTE').map(item => Number(item.log.args[0])))];
+            const candidateMaps = {};
+            await Promise.all(eids.map(async (eid) => {
+              try {
+                const list = await contract.getAllCandidates(eid);
+                candidateMaps[eid] = list;
+              } catch (e) {
+                console.warn(`Failed to fetch candidates for election #${eid} during scan`, e);
+              }
+            }));
+
             push(makeEntry('BOOT', `Loaded ${allHistorical.length} historical logs:`));
             for (const item of allHistorical) {
               const ev = item.log;
               if (item.type === 'VOTE') {
                 const [eid, voter, candidateId] = ev.args;
-                const candName = candidatesData.find(c =>
-                  Number(c.id ?? candidatesData.indexOf(c)) === Number(candidateId)
-                )?.name || `Candidate #${candidateId}`;
+                // Try to find in custom candidatesData if same election first, else use candidateMaps
+                let candName = `Candidate #${candidateId}`;
+                if (Number(eid) === Number(electionId)) {
+                  const found = candidatesData.find(c => Number(c.id ?? candidatesData.indexOf(c)) === Number(candidateId));
+                  if (found && found.name) candName = found.name;
+                }
+                if (candName === `Candidate #${candidateId}`) {
+                  const candList = candidateMaps[Number(eid)] || [];
+                  candName = candList.find(c => Number(c.id) === Number(candidateId))?.name || `Candidate #${candidateId}`;
+                }
                 push(makeEntry('VOTE', `Vote cast → ${candName}`, { sub: `by ${shortAddr(voter)} on Election #${eid} (past event)` }));
               } else if (item.type === 'REGISTER') {
                 const [eid, voter] = ev.args;
@@ -166,21 +185,40 @@ export default function LiveTerminalFeed({ electionId, candidatesData = [] }) {
         }
 
         /* ── VoteCast ── */
-        const onVoteCast = (eid, voter, candidateId) => {
+        const onVoteCast = async (eid, voter, candidateId) => {
           if (!mounted) return;
-          const candName = candidatesData.find(c =>
-            Number(c.id ?? candidatesData.indexOf(c)) === Number(candidateId)
-          )?.name || `Candidate #${candidateId}`;
+          let candName = `Candidate #${candidateId}`;
+          
+          // Try local candidatesData lookup first
+          if (Number(eid) === Number(electionId)) {
+            const found = candidatesData.find(c =>
+              Number(c.id ?? candidatesData.indexOf(c)) === Number(candidateId)
+            );
+            if (found && found.name) candName = found.name;
+          }
+          
+          // On-chain fetch fallback if candidate name not resolved
+          if (candName === `Candidate #${candidateId}`) {
+            try {
+              const list = await contract.getAllCandidates(eid);
+              const found = list.find(c => Number(c.id) === Number(candidateId));
+              if (found && found.name) candName = found.name;
+            } catch (err) {
+              console.warn("Failed to fetch candidate name on live vote:", err);
+            }
+          }
 
-          push(makeEntry('VOTE',
-            `Vote cast → ${candName}`,
-            { sub: `by ${shortAddr(voter)} on Election #${eid}` }
-          ));
+          if (mounted) {
+            push(makeEntry('VOTE',
+              `Vote cast → ${candName}`,
+              { sub: `by ${shortAddr(voter)} on Election #${eid}` }
+            ));
 
-          /* refresh results by dispatching custom event */
-          window.dispatchEvent(new CustomEvent('votechain:voteCast', {
-            detail: { electionId: Number(eid), candidateId: Number(candidateId), voter }
-          }));
+            /* refresh results by dispatching custom event */
+            window.dispatchEvent(new CustomEvent('votechain:voteCast', {
+              detail: { electionId: Number(eid), candidateId: Number(candidateId), voter }
+            }));
+          }
         };
 
         /* ── VoterRegistered ── */
