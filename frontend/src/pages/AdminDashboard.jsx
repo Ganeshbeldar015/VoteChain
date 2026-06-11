@@ -40,6 +40,7 @@ const AdminDashboard = () => {
   const [electionForm, setElectionForm] = useState({ title: '', description: '', startTime: '', endTime: '' });
   const [candidateForm, setCandidateForm] = useState({ electionId: '', name: '', party: '', imageUrl: '' });
   const [voterForm, setVoterForm] = useState({ electionId: '', voterAddress: '' });
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // Status logs
   const [message, setMessage] = useState({ text: '', isError: false });
@@ -100,6 +101,58 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error(error);
       showMessage(error.reason || error.message || "Failed to add candidate", true);
+    }
+  };
+
+  const handleImageFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const jwt = import.meta.env.VITE_PINATA_JWT;
+    const apiKey = import.meta.env.VITE_PINATA_API_KEY;
+    const apiSecret = import.meta.env.VITE_PINATA_API_SECRET;
+
+    if (!jwt && (!apiKey || !apiSecret)) {
+      showMessage("Please configure Pinata credentials (VITE_PINATA_JWT or VITE_PINATA_API_KEY) in your .env file to upload files.", true);
+      return;
+    }
+
+    try {
+      setUploadingImage(true);
+      showMessage("Uploading image to IPFS via Pinata...", false);
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('pinataMetadata', JSON.stringify({ name: `votechain-${Date.now()}-${file.name}` }));
+      formData.append('pinataOptions', JSON.stringify({ cidVersion: 0 }));
+
+      const headers = {};
+      if (jwt) {
+        headers['Authorization'] = `Bearer ${jwt.replace(/['"]/g, '').trim()}`;
+      } else {
+        headers['pinata_api_key'] = apiKey.replace(/['"]/g, '').trim();
+        headers['pinata_secret_api_key'] = apiSecret.replace(/['"]/g, '').trim();
+      }
+
+      const res = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", {
+        method: "POST",
+        headers,
+        body: formData
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error?.message || data.error || `HTTP ${res.status} error`);
+      }
+
+      const ipfsUrl = `https://gateway.pinata.cloud/ipfs/${data.IpfsHash}`;
+      setCandidateForm(prev => ({ ...prev, imageUrl: ipfsUrl }));
+      showMessage("Image uploaded to IPFS successfully!");
+    } catch (err) {
+      console.error("IPFS Upload error:", err);
+      showMessage(`IPFS upload failed: ${err.message}`, true);
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -515,16 +568,35 @@ const AdminDashboard = () => {
                   <label className="block text-xs uppercase tracking-wider text-muted font-bold mb-2 flex items-center">
                     <LinkIcon className="w-3.5 h-3.5 mr-1" /> Candidate Image URL (Optional)
                   </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. https://images.unsplash.com/..."
-                    value={candidateForm.imageUrl}
-                    onChange={(e) => setCandidateForm({ ...candidateForm, imageUrl: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:outline-none focus:border-primary/50 transition-all text-sm"
-                  />
-                  <p className="text-[11px] text-zinc-500 mt-2 leading-relaxed">
-                    💡 <strong>Where to store photos:</strong> Upload candidate photos to free services like <a href="https://postimages.org/" target="_blank" rel="noreferrer" className="underline hover:text-zinc-300 font-semibold">Postimages</a>, <a href="https://imgur.com" target="_blank" rel="noreferrer" className="underline hover:text-zinc-300 font-semibold">Imgur</a>, or <a href="https://www.pinata.cloud/" target="_blank" rel="noreferrer" className="underline hover:text-zinc-300 font-semibold">Pinata (IPFS)</a> and paste the direct link. Alternatively, save files in the project's <code>public</code> folder and type <code>/filename.jpg</code>.
-                  </p>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="e.g. https://images.unsplash.com/..."
+                      value={candidateForm.imageUrl}
+                      onChange={(e) => setCandidateForm({ ...candidateForm, imageUrl: e.target.value })}
+                      className="flex-1 bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:outline-none focus:border-primary/50 transition-all text-sm"
+                    />
+                    <div className="relative">
+                      <input
+                        type="file"
+                        id="pinata-upload-input"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageFileChange}
+                        disabled={uploadingImage}
+                      />
+                      <label
+                        htmlFor="pinata-upload-input"
+                        className={`h-full px-5 rounded-2xl font-bold text-xs flex items-center justify-center transition-all cursor-pointer ${
+                          uploadingImage 
+                          ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' 
+                          : 'bg-primary hover:bg-secondary text-white shadow-md'
+                        }`}
+                      >
+                        {uploadingImage ? 'Uploading...' : 'Upload Image'}
+                      </label>
+                    </div>
+                  </div>
                 </div>
 
                 <motion.button
