@@ -77,55 +77,108 @@ function HeroLiveTerminal() {
   },[push]);
 
   return (
-    <div style={{ fontFamily:"'JetBrains Mono','Fira Code','Courier New',monospace", background:'#0a0a12', borderRadius:'1.25rem', border:'1px solid rgba(124,58,237,0.3)', overflow:'hidden', boxShadow:'0 0 32px rgba(124,58,237,0.12)' }}>
-      {/* title bar */}
-      <div style={{ background:'rgba(255,255,255,0.04)', borderBottom:'1px solid rgba(255,255,255,0.07)', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 16px' }}>
-        <div style={{ display:'flex', gap:6 }}>
-          <span style={{ width:10,height:10,borderRadius:'50%',background:'#ff5f57',display:'block' }}/>
-          <span style={{ width:10,height:10,borderRadius:'50%',background:'#febc2e',display:'block' }}/>
-          <span style={{ width:10,height:10,borderRadius:'50%',background:'#28c840',display:'block' }}/>
+    <div style={{ fontFamily:"'JetBrains Mono','Fira Code','Courier New',monospace" }}>
+
+      {/* ── Status bar inside the card ── */}
+      <div style={{
+        display:'flex', alignItems:'center', justifyContent:'space-between',
+        marginBottom:10, padding:'6px 10px',
+        background:'#0f0f1a', borderRadius:'0.75rem',
+        border:'1px solid rgba(124,58,237,0.2)',
+      }}>
+        {/* traffic lights */}
+        <div style={{ display:'flex', gap:5 }}>
+          <span style={{ width:9,height:9,borderRadius:'50%',background:'#ff5f57',display:'block' }}/>
+          <span style={{ width:9,height:9,borderRadius:'50%',background:'#febc2e',display:'block' }}/>
+          <span style={{ width:9,height:9,borderRadius:'50%',background:'#28c840',display:'block' }}/>
         </div>
-        <span style={{ color:'#64748b', fontSize:11, display:'flex', alignItems:'center', gap:6 }}>
-          <Terminal size={11}/> VoteChain Event Daemon
+        <span style={{ color:'#475569', fontSize:10, display:'flex', alignItems:'center', gap:5 }}>
+          <Terminal size={10}/> VoteChain Event Daemon
         </span>
-        <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:10 }}>
-          {connected ? <Wifi size={11} style={{color:'#34d399'}}/> : <WifiOff size={11} style={{color:'#f87171'}}/>}
-          <span style={{ color: connected?'#34d399':'#f87171', letterSpacing:'0.05em' }}>{connected?'LIVE':'OFFLINE'}</span>
-          <span style={{ color:'#334155', marginLeft:6 }}>{events} events</span>
+        <div style={{ display:'flex', alignItems:'center', gap:4, fontSize:10 }}>
+          {connected ? <Wifi size={10} style={{color:'#34d399'}}/> : <WifiOff size={10} style={{color:'#ef4444'}}/>}
+          <span style={{ color:connected?'#34d399':'#ef4444', fontWeight:700, letterSpacing:'0.05em' }}>
+            {connected ? 'LIVE' : 'OFFLINE'}
+          </span>
+          <span style={{ color:'#334155', marginLeft:4 }}>{events} ev</span>
         </div>
       </div>
 
-      {/* log body */}
-      <div ref={bodyRef} onScroll={()=>{ if(!bodyRef.current)return; const {scrollTop,scrollHeight,clientHeight}=bodyRef.current; setAutoScroll(scrollTop+clientHeight>=scrollHeight-16); }} style={{ height:220, overflowY:'auto', padding:'12px 14px', display:'flex', flexDirection:'column', gap:1, scrollbarWidth:'thin', scrollbarColor:'rgba(124,58,237,0.25) transparent' }}>
-        <div style={{ color:'#6d28d9', fontSize:10, marginBottom:8, letterSpacing:'0.04em' }}>─── Realtime Blockchain Event Monitor ───</div>
+      {/* ── Log area ── */}
+      <div
+        ref={bodyRef}
+        onScroll={()=>{ if(!bodyRef.current)return; const {scrollTop,scrollHeight,clientHeight}=bodyRef.current; setAutoScroll(scrollTop+clientHeight>=scrollHeight-16); }}
+        style={{
+          height:230, overflowY:'auto',
+          background:'#0a0a14',
+          borderRadius:'0.75rem',
+          border:'1px solid rgba(124,58,237,0.15)',
+          padding:'10px 12px',
+          display:'flex', flexDirection:'column', gap:1,
+          scrollbarWidth:'thin', scrollbarColor:'rgba(124,58,237,0.2) transparent',
+        }}
+      >
+        <div style={{ color:'#4c1d95', fontSize:10, marginBottom:6, letterSpacing:'0.04em' }}>
+          ─── Realtime Blockchain Event Monitor ───
+        </div>
+
         <AnimatePresence initial={false}>
-          {logs.map(e=>{
-            const t=LOG_TYPES[e.type]||LOG_TYPES.BOOT;
+          {logs.map(e => {
+            const t = LOG_TYPES[e.type] || LOG_TYPES.BOOT;
             return (
-              <motion.div key={e.id} initial={{opacity:0,x:-6}} animate={{opacity:1,x:0}} transition={{duration:0.2}} style={{ fontSize:11, marginBottom:1 }}>
-                <div style={{ display:'flex', gap:8, alignItems:'baseline' }}>
-                  <span style={{ color:'#334155', minWidth:62, flexShrink:0 }}>[{e.time}]</span>
-                  <span style={{ color:t.color, minWidth:14, flexShrink:0 }}>{t.icon}</span>
-                  <span style={{ color:e.type==='VOTE'?'#e2e8f0':e.type==='WARN'?'#fca5a5':'#94a3b8' }}>{e.msg}</span>
+              <motion.div
+                key={e.id}
+                initial={{ opacity:0, x:-6 }}
+                animate={{ opacity:1, x:0 }}
+                transition={{ duration:0.18 }}
+                style={{ fontSize:10.5, marginBottom:1 }}
+              >
+                <div style={{ display:'flex', gap:7, alignItems:'baseline' }}>
+                  <span style={{ color:'#2d3748', minWidth:58, flexShrink:0 }}>[{e.time}]</span>
+                  <span style={{ color:t.color, minWidth:12, flexShrink:0 }}>{t.icon}</span>
+                  <span style={{ color: e.type==='VOTE' ? '#e2e8f0' : e.type==='WARN' ? '#fca5a5' : '#94a3b8' }}>
+                    {e.msg}
+                  </span>
                 </div>
-                {e.sub && <div style={{ paddingLeft:84, fontSize:10, color:'#334155' }}>└─ {e.sub}</div>}
+                {e.sub && (
+                  <div style={{ paddingLeft:77, fontSize:9.5, color:'#2d3748' }}>└─ {e.sub}</div>
+                )}
               </motion.div>
             );
           })}
         </AnimatePresence>
-        {/* cursor */}
+
+        {/* blinking cursor */}
         <div style={{ display:'flex', alignItems:'center', gap:5, marginTop:4 }}>
-          <span style={{ color:'#334155', fontSize:11 }}>$</span>
-          <motion.span animate={{opacity:[1,0,1]}} transition={{duration:1.1,repeat:Infinity}} style={{ display:'inline-block', width:7, height:12, background:connected?'#34d399':'#334155', borderRadius:2 }}/>
+          <span style={{ color:'#2d3748', fontSize:10.5 }}>$</span>
+          <motion.span
+            animate={{ opacity:[1,0,1] }}
+            transition={{ duration:1.1, repeat:Infinity }}
+            style={{ display:'inline-block', width:6, height:11, background:connected?'#34d399':'#2d3748', borderRadius:2 }}
+          />
         </div>
       </div>
 
-      {/* footer */}
-      <div style={{ background:'rgba(255,255,255,0.02)', borderTop:'1px solid rgba(255,255,255,0.06)', display:'flex', justifyContent:'space-between', alignItems:'center', padding:'6px 14px', fontSize:10, color:'#334155' }}>
-        <span><span style={{color:connected?'#34d399':'#f87171'}}>●</span> {connected?'LISTENING':'DISCONNECTED'}</span>
-        <span>EVENTS: <span style={{color:'#64748b'}}>{events}</span></span>
-        {!autoScroll&&<button onClick={()=>{setAutoScroll(true);if(bodyRef.current)bodyRef.current.scrollTop=bodyRef.current.scrollHeight;}} style={{background:'rgba(124,58,237,0.15)',color:'#a78bfa',border:'1px solid rgba(124,58,237,0.25)',borderRadius:9999,padding:'2px 8px',cursor:'pointer',fontSize:10,display:'flex',alignItems:'center',gap:3}}><ChevronDown size={9}/>bottom</button>}
+      {/* ── Footer ── */}
+      <div style={{
+        display:'flex', justifyContent:'space-between', alignItems:'center',
+        marginTop:8, fontSize:10, color:'#475569',
+      }}>
+        <span>
+          <span style={{ color:connected?'#34d399':'#ef4444' }}>●</span>{' '}
+          STATUS: <span style={{ color:connected?'#34d399':'#ef4444', fontWeight:700 }}>{connected?'LISTENING':'DISCONNECTED'}</span>
+        </span>
+        <span>EVENTS: <span style={{ color:'#64748b' }}>{events}</span></span>
+        {!autoScroll && (
+          <button
+            onClick={()=>{ setAutoScroll(true); if(bodyRef.current) bodyRef.current.scrollTop=bodyRef.current.scrollHeight; }}
+            style={{ background:'rgba(124,58,237,0.12)', color:'#a78bfa', border:'1px solid rgba(124,58,237,0.25)', borderRadius:9999, padding:'2px 8px', cursor:'pointer', fontSize:10, display:'flex', alignItems:'center', gap:3 }}
+          >
+            <ChevronDown size={9}/> bottom
+          </button>
+        )}
       </div>
+
     </div>
   );
 }
