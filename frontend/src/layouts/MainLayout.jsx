@@ -4,10 +4,18 @@ import Footer from '../components/Footer';
 import { useWallet } from '../context/WalletContext';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
+import { motion, useScroll, useSpring } from 'framer-motion';
 
 const MainLayout = () => {
   const { account, networkDetails } = useWallet();
   const [switching, setSwitching] = useState(false);
+  
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
 
   // If connected, check if contract bytecode length is 0 (or hex 0x / <= 2)
   const isWrongNetwork = account && networkDetails && networkDetails.codeLength <= 2;
@@ -55,6 +63,11 @@ const MainLayout = () => {
 
   return (
     <div className="min-h-screen bg-background text-zinc-900 selection:bg-primary/10 selection:text-primary flex flex-col justify-between">
+      {/* Scroll Progress Bar */}
+      <motion.div 
+        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-600 to-fuchsia-600 origin-left z-50 shadow-[0_0_10px_rgba(124,58,237,0.4)]" 
+        style={{ scaleX }} 
+      />
       <div>
         <Navbar />
         {isWrongNetwork && (
