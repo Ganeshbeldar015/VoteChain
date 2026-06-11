@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  ArrowRight, 
-  Play, 
   Server, 
   Sparkles,
   Terminal,
@@ -10,7 +8,6 @@ import {
   WifiOff,
   ChevronDown
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { ethers as ethersLib } from 'ethers';
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../services/blockchain';
 
@@ -291,112 +288,108 @@ function HeroLiveTerminal() {
 }
 
 const HeroSection = () => {
-  const { scrollY } = useScroll();
-  const scale = useTransform(scrollY, [0, 600], [1, 1.15]);
-  const y = useTransform(scrollY, [0, 600], [0, 50]);
-
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden bg-background pt-20 pb-12">
-      {/* Background Image */}
+      {/* Background Grid and Glows */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <motion.img 
-          src="/blockchain-img.jpg" 
-          alt="Blockchain background" 
-          style={{ scale, y }}
-          className="w-full h-full object-cover opacity-[0.18]"
+        {/* Subtle grid pattern */}
+        <div 
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, rgba(0, 0, 0, 0.1) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '40px 40px',
+          }}
+        />
+        {/* Soft radial color glow spots */}
+        <div 
+          className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-[120px] opacity-[0.05]"
+          style={{
+            background: 'radial-gradient(circle, #7c3aed 0%, transparent 80%)',
+          }}
+        />
+        <div 
+          className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-[500px] h-[500px] rounded-full blur-[120px] opacity-[0.05]"
+          style={{
+            background: 'radial-gradient(circle, #2563eb 0%, transparent 80%)',
+          }}
         />
       </div>
       
-      <div className="container mx-auto px-6 relative z-10 flex flex-col items-center text-center">
-        
-        {/* Title, Intro and Live Metrics centered */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="flex flex-col items-center max-w-3xl mb-12"
-        >
-          {/* Premium Badge */}
-          <div className="inline-flex items-center space-x-2 bg-white/5 border border-white/10 px-4 py-2 rounded-full mb-6 shadow-sm">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-            </span>
-            <span className="text-xs font-bold uppercase tracking-wider text-muted flex items-center">
-              <Sparkles className="w-3.5 h-3.5 mr-1.5 text-accent" />
-              Web3 Active Network
-            </span>
-          </div>
+      <div className="container mx-auto px-6 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-6 tracking-tight leading-tight">
-            Secure, Transparent <br className="hidden sm:inline" />
-            & <span className="gradient-text">Decentralized Voting</span>
-          </h1>
-          
-          <p className="text-base sm:text-lg text-muted max-w-2xl mb-8 leading-relaxed">
-            VoteChain implements absolute transparency in elections. Powered by zero-knowledge integrity, cryptographic keys, and permissionless audit logs.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <Link to="/elections" className="w-full sm:w-auto">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="bg-primary hover:bg-secondary text-white px-8 py-4 rounded-2xl font-bold flex items-center justify-center space-x-2 shadow-lg shadow-primary/20 transition-all w-full"
-              >
-                <span>Launch App</span>
-                <ArrowRight className="w-5 h-5" />
-              </motion.button>
-            </Link>
-            
-            <Link to="/results" className="w-full sm:w-auto">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 text-zinc-950 px-8 py-4 rounded-2xl font-bold flex items-center justify-center space-x-2 shadow-sm transition-all w-full"
-              >
-                <Play className="w-4 h-4 fill-zinc-950 mr-1" />
-                <span>View Results</span>
-              </motion.button>
-            </Link>
-          </div>
-
-        </motion.div>
-
-        {/* Centered Live Terminal Console underneath */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="w-full max-w-2xl relative"
-        >
-          {/* Outer Decorative Glow */}
-          <div className="absolute -inset-1.5 bg-gradient-to-r from-violet-600/20 to-fuchsia-600/20 rounded-3xl blur opacity-30" />
-          
-          {/* Simulator Card (Futuristic Dark Terminal Window) */}
-          <div className="rounded-3xl p-6 relative overflow-hidden shadow-2xl border border-zinc-800 bg-[#090a10] text-zinc-100 text-left">
-            
-           {/* Console Header */}
-            <div className="flex justify-between items-center pb-3 border-b border-zinc-800/80 mb-4">
-              <div className="flex items-center space-x-2">
+          {/* Left Column: Title, Intro and Live Metrics */}
+          <div className="lg:col-span-7 text-left">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              {/* Premium Badge */}
+              <div className="inline-flex items-center space-x-2 bg-white/5 border border-white/10 px-4 py-2 rounded-full mb-4 shadow-sm">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                 </span>
-                <span className="font-mono text-xs font-semibold text-zinc-400">VoteChain Terminal</span>
+                <span className="text-xs font-bold uppercase tracking-wider text-muted flex items-center">
+                  <Sparkles className="w-3.5 h-3.5 mr-1.5 text-accent" />
+                  Web3 Active Network
+                </span>
               </div>
-              <div className="bg-zinc-900 border border-zinc-800 px-2.5 py-1 rounded-full text-[10px] font-bold text-zinc-300 flex items-center">
-                <Server className="w-3 h-3 mr-1 text-zinc-400" /> Sepolia
-              </div>
-            </div>
+              
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4 tracking-tight leading-tight">
+                Secure, Transparent <br className="hidden sm:inline" />
+                & <span className="gradient-text">Decentralized Voting</span>
+              </h1>
+              
+              <p className="text-base text-muted max-w-xl mb-2 leading-relaxed">
+                VoteChain implements absolute transparency in elections. Powered by zero-knowledge integrity, cryptographic keys, and permissionless audit logs.
+              </p>
 
-            {/* Real-time Blockchain Event Daemon */}
-            <HeroLiveTerminal />
-
+            </motion.div>
           </div>
 
-        </motion.div>
+          {/* Right Column: Interactive Voting Simulator Console */}
+          <div className="lg:col-span-5 relative flex justify-center w-full">
+            
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="w-full max-w-md relative"
+            >
+              {/* Outer Decorative Glow */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-violet-600/20 to-fuchsia-600/20 rounded-3xl blur opacity-30" />
+              
+              {/* Simulator Card (Futuristic Dark Terminal Window) */}
+              <div className="rounded-3xl p-6 relative overflow-hidden shadow-2xl border border-zinc-800 bg-[#090a10] text-zinc-100">
+                
+               {/* Console Header */}
+                <div className="flex justify-between items-center pb-3 border-b border-zinc-800/80 mb-4">
+                  <div className="flex items-center space-x-2">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                    </span>
+                    <span className="font-mono text-xs font-semibold text-zinc-400">VoteChain Terminal</span>
+                  </div>
+                  <div className="bg-zinc-900 border border-zinc-800 px-2.5 py-1 rounded-full text-[10px] font-bold text-zinc-300 flex items-center">
+                    <Server className="w-3 h-3 mr-1 text-zinc-400" /> Sepolia
+                  </div>
+                </div>
 
+                {/* Real-time Blockchain Event Daemon */}
+                <HeroLiveTerminal />
+
+              </div>
+
+            </motion.div>
+          </div>
+
+        </div>
       </div>
     </section>
   );
