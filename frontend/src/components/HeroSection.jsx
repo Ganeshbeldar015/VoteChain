@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { 
   ArrowRight, 
@@ -8,9 +8,127 @@ import {
   Server, 
   RefreshCw, 
   Sparkles,
-  Lock
+  Lock,
+  Terminal,
+  Wifi,
+  WifiOff,
+  ChevronDown
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { ethers as ethersLib } from 'ethers';
+import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../services/blockchain';
+
+/* ── tiny inline terminal used only in the hero ── */
+const LOG_TYPES = {
+  BOOT:     { icon: '●', color: '#a78bfa' },
+  VOTE:     { icon: '✔', color: '#34d399' },
+  REGISTER: { icon: 'ℹ', color: '#60a5fa' },
+  ELECTION: { icon: '⚡', color: '#fbbf24' },
+  WARN:     { icon: '▲', color: '#f87171' },
+  NETWORK:  { icon: '◈', color: '#c084fc' },
+};
+const MAX_LOGS = 40;
+function fmtTime(d){ return d.toLocaleTimeString('en-US',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+function short(a){ return a?.length>10?`${a.slice(0,6)}…${a.slice(-4)}`:a; }
+function mkLog(type, msg, sub){ return { id: Date.now()+Math.random(), time: fmtTime(new Date()), type, msg, sub }; }
+
+function HeroLiveTerminal() {
+  const [logs, setLogs] = useState([]);
+  const [connected, setConnected] = useState(false);
+  const [events, setEvents] = useState(0);
+  const [autoScroll, setAutoScroll] = useState(true);
+  const bodyRef = useRef(null);
+  const contractRef = useRef(null);
+
+  const push = useCallback((entry) => {
+    setLogs(p => { const n=[...p,entry]; return n.length>MAX_LOGS?n.slice(n.length-MAX_LOGS):n; });
+    setEvents(n=>n+1);
+  }, []);
+
+  useEffect(()=>{ if(autoScroll&&bodyRef.current) bodyRef.current.scrollTop=bodyRef.current.scrollHeight; },[logs,autoScroll]);
+
+  useEffect(()=>{
+    let mounted=true;
+    const boot=async()=>{
+      setLogs([mkLog('BOOT','VoteChain Event Daemon v1.0 initializing...')]);
+      if(!window.ethereum){ push(mkLog('WARN','MetaMask not detected. Connect a wallet.')); return; }
+      try {
+        const provider=new ethersLib.BrowserProvider(window.ethereum);
+        const network=await provider.getNetwork();
+        if(!mounted) return;
+        const chain=network.name==='unknown'?`Chain ${network.chainId}`:network.name;
+        push(mkLog('NETWORK',`Connected to ${chain}`));
+        push(mkLog('BOOT',`Attaching to ${short(CONTRACT_ADDRESS)}...`));
+        const contract=new ethersLib.Contract(CONTRACT_ADDRESS,CONTRACT_ABI,provider);
+        contractRef.current=contract;
+
+        contract.on('VoteCast',(eid,voter,cid)=>{ if(!mounted)return; push(mkLog('VOTE',`Vote → Candidate #${cid}`,`by ${short(voter)} · Election #${eid}`)); });
+        contract.on('VoterRegistered',(eid,voter)=>{ if(!mounted)return; push(mkLog('REGISTER',`Voter registered`,`${short(voter)} · Election #${eid}`)); });
+        contract.on('ElectionStarted',(eid)=>{ if(!mounted)return; push(mkLog('ELECTION',`Election #${eid} STARTED`)); });
+        contract.on('ElectionEnded',(eid)=>{ if(!mounted)return; push(mkLog('ELECTION',`Election #${eid} ENDED`)); });
+        contract.on('CandidateAdded',(eid,cid,name)=>{ if(!mounted)return; push(mkLog('ELECTION',`Candidate "${name}" added`)); });
+        contract.on('ElectionCreated',(eid,title)=>{ if(!mounted)return; push(mkLog('ELECTION',`New election: "${title}"`)); });
+
+        if(mounted){ setConnected(true); push(mkLog('BOOT','All listeners active. Awaiting events...')); }
+      } catch(err){ if(!mounted)return; push(mkLog('WARN',`Connection failed: ${err.message?.slice(0,60)}`)); }
+    };
+    boot();
+    return ()=>{ mounted=false; if(contractRef.current){contractRef.current.removeAllListeners();contractRef.current=null;} };
+  },[push]);
+
+  return (
+    <div style={{ fontFamily:"'JetBrains Mono','Fira Code','Courier New',monospace", background:'#0a0a12', borderRadius:'1.25rem', border:'1px solid rgba(124,58,237,0.3)', overflow:'hidden', boxShadow:'0 0 32px rgba(124,58,237,0.12)' }}>
+      {/* title bar */}
+      <div style={{ background:'rgba(255,255,255,0.04)', borderBottom:'1px solid rgba(255,255,255,0.07)', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 16px' }}>
+        <div style={{ display:'flex', gap:6 }}>
+          <span style={{ width:10,height:10,borderRadius:'50%',background:'#ff5f57',display:'block' }}/>
+          <span style={{ width:10,height:10,borderRadius:'50%',background:'#febc2e',display:'block' }}/>
+          <span style={{ width:10,height:10,borderRadius:'50%',background:'#28c840',display:'block' }}/>
+        </div>
+        <span style={{ color:'#64748b', fontSize:11, display:'flex', alignItems:'center', gap:6 }}>
+          <Terminal size={11}/> VoteChain Event Daemon
+        </span>
+        <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:10 }}>
+          {connected ? <Wifi size={11} style={{color:'#34d399'}}/> : <WifiOff size={11} style={{color:'#f87171'}}/>}
+          <span style={{ color: connected?'#34d399':'#f87171', letterSpacing:'0.05em' }}>{connected?'LIVE':'OFFLINE'}</span>
+          <span style={{ color:'#334155', marginLeft:6 }}>{events} events</span>
+        </div>
+      </div>
+
+      {/* log body */}
+      <div ref={bodyRef} onScroll={()=>{ if(!bodyRef.current)return; const {scrollTop,scrollHeight,clientHeight}=bodyRef.current; setAutoScroll(scrollTop+clientHeight>=scrollHeight-16); }} style={{ height:220, overflowY:'auto', padding:'12px 14px', display:'flex', flexDirection:'column', gap:1, scrollbarWidth:'thin', scrollbarColor:'rgba(124,58,237,0.25) transparent' }}>
+        <div style={{ color:'#6d28d9', fontSize:10, marginBottom:8, letterSpacing:'0.04em' }}>─── Realtime Blockchain Event Monitor ───</div>
+        <AnimatePresence initial={false}>
+          {logs.map(e=>{
+            const t=LOG_TYPES[e.type]||LOG_TYPES.BOOT;
+            return (
+              <motion.div key={e.id} initial={{opacity:0,x:-6}} animate={{opacity:1,x:0}} transition={{duration:0.2}} style={{ fontSize:11, marginBottom:1 }}>
+                <div style={{ display:'flex', gap:8, alignItems:'baseline' }}>
+                  <span style={{ color:'#334155', minWidth:62, flexShrink:0 }}>[{e.time}]</span>
+                  <span style={{ color:t.color, minWidth:14, flexShrink:0 }}>{t.icon}</span>
+                  <span style={{ color:e.type==='VOTE'?'#e2e8f0':e.type==='WARN'?'#fca5a5':'#94a3b8' }}>{e.msg}</span>
+                </div>
+                {e.sub && <div style={{ paddingLeft:84, fontSize:10, color:'#334155' }}>└─ {e.sub}</div>}
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+        {/* cursor */}
+        <div style={{ display:'flex', alignItems:'center', gap:5, marginTop:4 }}>
+          <span style={{ color:'#334155', fontSize:11 }}>$</span>
+          <motion.span animate={{opacity:[1,0,1]}} transition={{duration:1.1,repeat:Infinity}} style={{ display:'inline-block', width:7, height:12, background:connected?'#34d399':'#334155', borderRadius:2 }}/>
+        </div>
+      </div>
+
+      {/* footer */}
+      <div style={{ background:'rgba(255,255,255,0.02)', borderTop:'1px solid rgba(255,255,255,0.06)', display:'flex', justifyContent:'space-between', alignItems:'center', padding:'6px 14px', fontSize:10, color:'#334155' }}>
+        <span><span style={{color:connected?'#34d399':'#f87171'}}>●</span> {connected?'LISTENING':'DISCONNECTED'}</span>
+        <span>EVENTS: <span style={{color:'#64748b'}}>{events}</span></span>
+        {!autoScroll&&<button onClick={()=>{setAutoScroll(true);if(bodyRef.current)bodyRef.current.scrollTop=bodyRef.current.scrollHeight;}} style={{background:'rgba(124,58,237,0.15)',color:'#a78bfa',border:'1px solid rgba(124,58,237,0.25)',borderRadius:9999,padding:'2px 8px',cursor:'pointer',fontSize:10,display:'flex',alignItems:'center',gap:3}}><ChevronDown size={9}/>bottom</button>}
+      </div>
+    </div>
+  );
+}
 
 const getUnixTimestamp = () => Math.floor(Date.now() / 1000);
 
@@ -29,6 +147,7 @@ const HeroSection = () => {
   const [txHash, setTxHash] = useState('');
   const [blockNum, setBlockNum] = useState(0);
   const [simTimestamp, setSimTimestamp] = useState(0);
+  const [heroTab, setHeroTab] = useState('demo'); // 'demo' | 'live'
 
   const startSimulation = (candidateId) => {
     setVotedFor(candidateId);
@@ -159,22 +278,47 @@ const HeroSection = () => {
               {/* Simulator Card */}
               <div className="glass-card rounded-3xl p-6 relative overflow-hidden shadow-2xl border border-zinc-200 bg-white">
                 
-                {/* Console Header */}
-                <div className="flex justify-between items-center mb-6 pb-4 border-b border-white/10">
-                  <div className="flex items-center space-x-2">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                    </span>
-                    <span className="font-mono text-xs font-bold text-zinc-500">Demo Terminal v1.0</span>
+               {/* Console Header with Tab Toggle */}
+                <div className="mb-4">
+                  <div className="flex justify-between items-center pb-3 border-b border-zinc-100 mb-3">
+                    <div className="flex items-center space-x-2">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                      </span>
+                      <span className="font-mono text-xs font-bold text-zinc-500">VoteChain Terminal</span>
+                    </div>
+                    <div className="bg-zinc-100 border border-zinc-200 px-2.5 py-1 rounded-full text-[10px] font-bold text-zinc-600 flex items-center">
+                      <Server className="w-3 h-3 mr-1 text-zinc-500" /> Sepolia
+                    </div>
                   </div>
-                  <div className="bg-zinc-100 border border-zinc-200 px-2.5 py-1 rounded-full text-[10px] font-bold text-zinc-600 flex items-center">
-                    <Server className="w-3 h-3 mr-1 text-zinc-500" /> Base Sepolia
+                  {/* Tab switcher */}
+                  <div className="flex bg-zinc-100 rounded-xl p-1 gap-1">
+                    <button
+                      onClick={() => setHeroTab('demo')}
+                      className={`flex-1 text-xs font-bold py-1.5 rounded-lg transition-all ${heroTab === 'demo' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-700'}`}
+                    >
+                      🗳 Demo Simulator
+                    </button>
+                    <button
+                      onClick={() => setHeroTab('live')}
+                      className={`flex-1 text-xs font-bold py-1.5 rounded-lg transition-all flex items-center justify-center gap-1.5 ${heroTab === 'live' ? 'bg-zinc-900 text-green-400 shadow-sm' : 'text-zinc-500 hover:text-zinc-700'}`}
+                    >
+                      <span className={`w-1.5 h-1.5 rounded-full ${heroTab === 'live' ? 'bg-green-400 animate-pulse' : 'bg-zinc-400'}`} />
+                      Live Feed
+                    </button>
                   </div>
                 </div>
 
                 {/* Main Simulator Window Content */}
-                <div className="relative min-h-[260px] flex flex-col justify-between">
+                <AnimatePresence mode="wait">
+                  {heroTab === 'live' ? (
+                    <motion.div key="live" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:0.25}}>
+                      <HeroLiveTerminal />
+                    </motion.div>
+                  ) : (
+                  <motion.div key="demo" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} transition={{duration:0.25}}>
+                  <div className="relative min-h-[260px] flex flex-col justify-between">
                   <AnimatePresence mode="wait">
                     
                     {/* IDLE STATE */}
@@ -332,6 +476,9 @@ const HeroSection = () => {
 
                   </AnimatePresence>
                 </div>
+                  </motion.div>
+                  )}
+                </AnimatePresence>
 
               </div>
 
