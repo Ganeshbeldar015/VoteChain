@@ -84,19 +84,19 @@ function HeroLiveTerminal() {
       }}>
         {/* traffic lights */}
         <div style={{ display:'flex', gap:5 }}>
-          <span style={{ width:9,height:9,borderRadius:'50%',background:'#ff5f57',display:'block' }}/>
-          <span style={{ width:9,height:9,borderRadius:'50%',background:'#febc2e',display:'block' }}/>
-          <span style={{ width:9,height:9,borderRadius:'50%',background:'#28c840',display:'block' }}/>
+          <span className="text-terminal" style={{ width:9,height:9,borderRadius:'50%',background:'#ff5f57',display:'block' }}/>
+          <span className="text-terminal" style={{ width:9,height:9,borderRadius:'50%',background:'#febc2e',display:'block' }}/>
+          <span className="text-terminal" style={{ width:9,height:9,borderRadius:'50%',background:'#28c840',display:'block' }}/>
         </div>
-        <span style={{ color:'#94a3b8', fontSize:10, display:'flex', alignItems:'center', gap:5 }}>
+        <span className="text-terminal" style={{ color:'#94a3b8', fontSize:10, display:'flex', alignItems:'center', gap:5 }}>
           <Terminal size={10}/> VoteChain Event Daemon
         </span>
         <div style={{ display:'flex', alignItems:'center', gap:4, fontSize:10 }}>
           {connected ? <Wifi size={10} style={{color:'#34d399'}}/> : <WifiOff size={10} style={{color:'#ef4444'}}/>}
-          <span style={{ color:connected?'#34d399':'#ef4444', fontWeight:700, letterSpacing:'0.05em' }}>
+          <span className="text-terminal" style={{ color:connected?'#34d399':'#ef4444', fontWeight:700, letterSpacing:'0.05em' }}>
             {connected ? 'LIVE' : 'OFFLINE'}
           </span>
-          <span style={{ color:'#64748b', marginLeft:4 }}>{events} ev</span>
+          <span className="text-terminal" style={{ color:'#64748b', marginLeft:4 }}>{events} ev</span>
         </div>
       </div>
 
@@ -130,9 +130,9 @@ function HeroLiveTerminal() {
                 style={{ fontSize:10.5, marginBottom:1 }}
               >
                 <div style={{ display:'flex', gap:7, alignItems:'baseline' }}>
-                  <span style={{ color:'#64748b', minWidth:58, flexShrink:0 }}>[{e.time}]</span>
-                  <span style={{ color:t.color, minWidth:12, flexShrink:0 }}>{t.icon}</span>
-                  <span style={{ color: e.type==='WARN' ? '#fca5a5' : '#f1f5f9' }}>
+                  <span className="text-terminal" style={{ color:'#64748b', minWidth:58, flexShrink:0 }}>[{e.time}]</span>
+                  <span className="text-terminal" style={{ color:t.color, minWidth:12, flexShrink:0 }}>{t.icon}</span>
+                  <span className="text-terminal" style={{ color: e.type==='WARN' ? '#fca5a5' : '#f1f5f9' }}>
                     {e.msg}
                   </span>
                 </div>
@@ -146,7 +146,7 @@ function HeroLiveTerminal() {
 
         {/* blinking cursor */}
         <div style={{ display:'flex', alignItems:'center', gap:5, marginTop:4 }}>
-          <span style={{ color:'#64748b', fontSize:10.5 }}>$</span>
+          <span className="text-terminal" style={{ color:'#64748b', fontSize:10.5 }}>$</span>
           <motion.span
             animate={{ opacity:[1,0,1] }}
             transition={{ duration:1.1, repeat:Infinity }}
@@ -160,11 +160,11 @@ function HeroLiveTerminal() {
         display:'flex', justifyContent:'space-between', alignItems:'center',
         marginTop:8, fontSize:10, color:'#475569',
       }}>
-        <span>
-          <span style={{ color:connected?'#34d399':'#ef4444' }}>●</span>{' '}
-          STATUS: <span style={{ color:connected?'#34d399':'#ef4444', fontWeight:700 }}>{connected?'LISTENING':'DISCONNECTED'}</span>
+        <span className="text-terminal">
+          <span className="text-terminal" style={{ color:connected?'#34d399':'#ef4444' }}>●</span>{' '}
+          STATUS: <span className="text-terminal" style={{ color:connected?'#34d399':'#ef4444', fontWeight:700 }}>{connected?'LISTENING':'DISCONNECTED'}</span>
         </span>
-        <span>EVENTS: <span style={{ color:'#64748b' }}>{events}</span></span>
+        <span className="text-terminal">EVENTS: <span className="text-terminal" style={{ color:'#64748b' }}>{events}</span></span>
         {!autoScroll && (
           <button
             onClick={()=>{ setAutoScroll(true); if(bodyRef.current) bodyRef.current.scrollTop=bodyRef.current.scrollHeight; }}
