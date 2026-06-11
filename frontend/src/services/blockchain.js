@@ -284,8 +284,9 @@ export const checkIsAdmin = async (account) => {
     if (!provider) throw new Error("No provider found");
 
     const code = await provider.getCode(CONTRACT_ADDRESS);
-    if (code === "0x") {
+    if (code === "0x" || code === "0x0" || !code) {
       console.warn("WARNING: The contract does not exist on the network MetaMask is currently connected to!");
+      return false;
     }
 
     const contract = await getContract();
@@ -294,6 +295,6 @@ export const checkIsAdmin = async (account) => {
     return hasRole;
   } catch (error) {
     console.error("Error checking admin status:", error);
-    throw error;
+    return false;
   }
 };
