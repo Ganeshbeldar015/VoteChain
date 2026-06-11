@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { Trophy, Users, CheckCircle2, TrendingUp, Calendar, AlertCircle } from 'lucide-react';
 import { useWallet } from '../context/WalletContext';
 import { getResults } from '../services/blockchain';
+import LiveTerminalFeed from '../components/LiveTerminalFeed';
 
 const COLORS = ['#7C3AED', '#8B5CF6', '#A855F7', '#D8B4FE', '#818CF8', '#C084FC'];
 
@@ -16,26 +17,40 @@ const Results = () => {
   const effectiveElectionId = selectedElectionId || (elections[0]?.id.toString() || '');
 
   // Fetch results when selection changes
+  const fetchElectionResults = useCallback(async (showSpinner = true) => {
+    if (!effectiveElectionId) return;
+    try {
+      if (showSpinner) setLoadingResults(true);
+      const results = await getResults(Number(effectiveElectionId));
+      setCandidatesData(results.map((c, index) => ({
+        id: c.id ?? index,
+        name: c.name,
+        votes: c.votes,
+        party: c.party,
+        color: COLORS[index % COLORS.length]
+      })));
+    } catch (error) {
+      if (import.meta.env.DEV) console.error("Error fetching election results:", error);
+    } finally {
+      if (showSpinner) setLoadingResults(false);
+    }
+  }, [effectiveElectionId]);
+
   useEffect(() => {
-    const fetchElectionResults = async () => {
-      if (!effectiveElectionId) return;
-      try {
-        setLoadingResults(true);
-        const results = await getResults(Number(effectiveElectionId));
-        setCandidatesData(results.map((c, index) => ({
-          name: c.name,
-          votes: c.votes,
-          party: c.party,
-          color: COLORS[index % COLORS.length]
-        })));
-      } catch (error) {
-        console.error("Error fetching election results:", error);
-      } finally {
-        setLoadingResults(false);
+    fetchElectionResults(true);
+  }, [fetchElectionResults]);
+
+  // 🔴 Live auto-refresh: triggered by the LiveTerminalFeed when a VoteCast event fires
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.detail?.electionId === Number(effectiveElectionId)) {
+        // Silently refresh results (no loading spinner) so charts update live
+        fetchElectionResults(false);
       }
     };
-    fetchElectionResults();
-  }, [effectiveElectionId]);
+    window.addEventListener('votechain:voteCast', handler);
+    return () => window.removeEventListener('votechain:voteCast', handler);
+  }, [effectiveElectionId, fetchElectionResults]);
 
   const selectedElection = elections.find(e => e.id.toString() === effectiveElectionId);
 
@@ -134,6 +149,26 @@ const Results = () => {
                 <h3 className="text-2xl font-bold">{electionStatusText}</h3>
              </div>
           </div>
+
+          {/* ── Live Terminal Feed ── */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="mb-10"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <h3 className="text-xl font-bold">Realtime Event Log</h3>
+              <span className="text-xs px-3 py-1 rounded-full font-semibold"
+                style={{ background: 'rgba(52,211,153,0.12)', color: '#34d399', border: '1px solid rgba(52,211,153,0.2)' }}>
+                LIVE
+              </span>
+            </div>
+            <LiveTerminalFeed
+              electionId={effectiveElectionId}
+              candidatesData={candidatesData}
+            />
+          </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
              {/* Bar Chart */}

@@ -19,6 +19,14 @@ export const CONTRACT_ABI = [
   "error VoteChain__AlreadyVoted()",
   "error AccessControlUnauthorizedAccount(address account, bytes32 neededRole)",
 
+  // Events
+  "event VoteCast(uint256 indexed electionId, address indexed voter, uint256 indexed candidateId)",
+  "event ElectionCreated(uint256 indexed electionId, string title, uint256 startTime, uint256 endTime)",
+  "event ElectionStarted(uint256 indexed electionId)",
+  "event ElectionEnded(uint256 indexed electionId)",
+  "event CandidateAdded(uint256 indexed electionId, uint256 indexed candidateId, string name)",
+  "event VoterRegistered(uint256 indexed electionId, address indexed voter)",
+
   // Functions
   "function createElection(string title, string description, uint256 startTime, uint256 endTime) external returns (uint256)",
   "function addCandidate(uint256 electionId, string name, string party, string imageUrl) external",
