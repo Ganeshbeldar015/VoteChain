@@ -189,8 +189,8 @@ function HeroLiveTerminal() {
       <div style={{
         display:'flex', alignItems:'center', justifyContent:'space-between',
         marginBottom:10, padding:'6px 10px',
-        background:'#0f0f1a', borderRadius:'0.75rem',
-        border:'1px solid rgba(124,58,237,0.25)',
+        background:'#090a10', borderRadius:'0.75rem',
+        border:'1px solid rgba(255,255,255,0.08)',
       }}>
         {/* traffic lights */}
         <div style={{ display:'flex', gap:5 }}>
@@ -219,10 +219,10 @@ function HeroLiveTerminal() {
           height:230, overflowY:'auto',
           background:'#05070c',
           borderRadius:'0.75rem',
-          border:'1px solid rgba(124,58,237,0.25)',
+          border:'1px solid rgba(255,255,255,0.08)',
           padding:'10px 12px',
           display:'flex', flexDirection:'column', gap:1,
-          scrollbarWidth:'thin', scrollbarColor:'rgba(124,58,237,0.2) transparent',
+          scrollbarWidth:'thin', scrollbarColor:'rgba(255,255,255,0.1) transparent',
         }}
       >
         <div style={{ color:'#c084fc', fontSize:10, marginBottom:6, letterSpacing:'0.04em' }}>
@@ -311,7 +311,7 @@ const HeroSection = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           
           {/* Left Column: Title, Intro and Live Metrics */}
-          <div className="lg:col-span-6 text-left">
+          <div className="lg:col-span-7 text-left">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -329,8 +329,8 @@ const HeroSection = () => {
                 </span>
               </div>
               
-              <h1 className="text-4xl sm:text-5xl md:text-[3.25rem] font-extrabold mb-4 tracking-tight leading-tight">
-                Secure, Transparent <br />
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4 tracking-tight leading-tight">
+                Secure, Transparent <br className="hidden sm:inline" />
                 & <span className="gradient-text">Decentralized Voting</span>
               </h1>
               
@@ -338,36 +338,35 @@ const HeroSection = () => {
                 VoteChain implements absolute transparency in elections. Powered by zero-knowledge integrity, cryptographic keys, and permissionless audit logs.
               </p>
               
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-4">
-                <Link to="/elections">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-4">
+                <Link to="/elections" className="w-full sm:w-auto">
                   <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="bg-primary hover:bg-secondary text-white px-8 py-4 rounded-2xl font-bold flex items-center justify-center space-x-2 shadow-lg shadow-primary/20 transition-all w-full sm:w-auto"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="bg-primary hover:bg-secondary text-white px-8 py-4 rounded-2xl font-bold flex items-center justify-center space-x-2 shadow-lg shadow-primary/20 transition-all w-full"
                   >
                     <span>Launch App</span>
                     <ArrowRight className="w-5 h-5" />
                   </motion.button>
                 </Link>
                 
-                <Link to="/results">
+                <Link to="/results" className="w-full sm:w-auto">
                   <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-900 px-8 py-4 rounded-2xl font-bold flex items-center justify-center space-x-2 backdrop-blur-sm transition-all w-full sm:w-auto"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 text-zinc-950 px-8 py-4 rounded-2xl font-bold flex items-center justify-center space-x-2 shadow-sm transition-all w-full"
                   >
-                    <Play className="w-4 h-4 fill-zinc-900 mr-1" />
+                    <Play className="w-4 h-4 fill-zinc-950 mr-1" />
                     <span>View Results</span>
                   </motion.button>
                 </Link>
               </div>
 
-
             </motion.div>
           </div>
 
           {/* Right Column: Interactive Voting Simulator Console */}
-          <div className="lg:col-span-6 relative flex justify-center">
+          <div className="lg:col-span-5 relative flex justify-center w-full">
             
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
@@ -376,22 +375,22 @@ const HeroSection = () => {
               className="w-full max-w-md relative"
             >
               {/* Outer Decorative Glow */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-zinc-200 to-zinc-300 rounded-3xl blur opacity-25" />
+              <div className="absolute -inset-1 bg-gradient-to-r from-violet-600/20 to-fuchsia-600/20 rounded-3xl blur opacity-30" />
               
-              {/* Simulator Card */}
-              <div className="glass-card rounded-3xl p-6 relative overflow-hidden shadow-2xl border border-zinc-200 bg-white">
+              {/* Simulator Card (Futuristic Dark Terminal Window) */}
+              <div className="rounded-3xl p-6 relative overflow-hidden shadow-2xl border border-zinc-800 bg-[#090a10] text-zinc-100">
                 
                {/* Console Header */}
-                <div className="flex justify-between items-center pb-3 border-b border-zinc-100 mb-4">
+                <div className="flex justify-between items-center pb-3 border-b border-zinc-800/80 mb-4">
                   <div className="flex items-center space-x-2">
                     <span className="relative flex h-2 w-2">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                     </span>
-                    <span className="font-mono text-xs font-bold text-zinc-500">VoteChain Terminal</span>
+                    <span className="font-mono text-xs font-semibold text-zinc-400">VoteChain Terminal</span>
                   </div>
-                  <div className="bg-zinc-100 border border-zinc-200 px-2.5 py-1 rounded-full text-[10px] font-bold text-zinc-600 flex items-center">
-                    <Server className="w-3 h-3 mr-1 text-zinc-500" /> Sepolia
+                  <div className="bg-zinc-900 border border-zinc-800 px-2.5 py-1 rounded-full text-[10px] font-bold text-zinc-300 flex items-center">
+                    <Server className="w-3 h-3 mr-1 text-zinc-400" /> Sepolia
                   </div>
                 </div>
 
@@ -399,8 +398,6 @@ const HeroSection = () => {
                 <HeroLiveTerminal />
 
               </div>
-
-
 
             </motion.div>
           </div>
