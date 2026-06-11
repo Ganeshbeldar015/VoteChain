@@ -106,6 +106,65 @@ export default function LiveTerminalFeed({ electionId, candidatesData = [] }) {
         contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
         contractRef.current = contract;
 
+        /* Fetch historical events (last 1900 blocks to comply with RPC range limitations) */
+        try {
+          const currentBlock = await provider.getBlockNumber();
+          const fromBlock = Math.max(0, currentBlock - 1900);
+          
+          push(makeEntry('BOOT', `Scanning recent blocks for on-chain events...`));
+          
+          const voteFilter = contract.filters.VoteCast();
+          const registerFilter = contract.filters.VoterRegistered();
+          const createFilter = contract.filters.ElectionCreated();
+          const startFilter = contract.filters.ElectionStarted();
+          const endFilter = contract.filters.ElectionEnded();
+          
+          const [votes, registers, creations, starts, ends] = await Promise.all([
+            contract.queryFilter(voteFilter, fromBlock),
+            contract.queryFilter(registerFilter, fromBlock),
+            contract.queryFilter(createFilter, fromBlock),
+            contract.queryFilter(startFilter, fromBlock),
+            contract.queryFilter(endFilter, fromBlock)
+          ]);
+          
+          const allHistorical = [
+            ...votes.map(ev => ({ type: 'VOTE', block: ev.blockNumber, txIndex: ev.transactionIndex, log: ev })),
+            ...registers.map(ev => ({ type: 'REGISTER', block: ev.blockNumber, txIndex: ev.transactionIndex, log: ev })),
+            ...creations.map(ev => ({ type: 'ELECTION', block: ev.blockNumber, txIndex: ev.transactionIndex, log: ev })),
+            ...starts.map(ev => ({ type: 'ELECTION', block: ev.blockNumber, txIndex: ev.transactionIndex, log: ev })),
+            ...ends.map(ev => ({ type: 'ELECTION', block: ev.blockNumber, txIndex: ev.transactionIndex, log: ev }))
+          ].sort((a, b) => a.block - b.block || a.txIndex - b.txIndex);
+          
+          if (mounted && allHistorical.length > 0) {
+            push(makeEntry('BOOT', `Loaded ${allHistorical.length} historical logs:`));
+            for (const item of allHistorical) {
+              const ev = item.log;
+              if (item.type === 'VOTE') {
+                const [eid, voter, candidateId] = ev.args;
+                const candName = candidatesData.find(c =>
+                  Number(c.id ?? candidatesData.indexOf(c)) === Number(candidateId)
+                )?.name || `Candidate #${candidateId}`;
+                push(makeEntry('VOTE', `Vote cast → ${candName}`, { sub: `by ${shortAddr(voter)} on Election #${eid} (past event)` }));
+              } else if (item.type === 'REGISTER') {
+                const [eid, voter] = ev.args;
+                push(makeEntry('REGISTER', `Voter registered`, { sub: `${shortAddr(voter)} on Election #${eid} (past event)` }));
+              } else if (ev.eventName === 'ElectionCreated') {
+                const [eid, title] = ev.args;
+                push(makeEntry('ELECTION', `New election: "${title}" (ID #${eid})`));
+              } else if (ev.eventName === 'ElectionStarted') {
+                const [eid] = ev.args;
+                push(makeEntry('ELECTION', `Election #${eid} started — voting is now OPEN`));
+              } else if (ev.eventName === 'ElectionEnded') {
+                const [eid] = ev.args;
+                push(makeEntry('ELECTION', `Election #${eid} closed — polls are SHUT`));
+              }
+            }
+          }
+        } catch (histError) {
+          console.warn("Failed to fetch historical events:", histError);
+          push(makeEntry('WARN', "Historical scan skipped (RPC range restriction)."));
+        }
+
         /* ── VoteCast ── */
         const onVoteCast = (eid, voter, candidateId) => {
           if (!mounted) return;

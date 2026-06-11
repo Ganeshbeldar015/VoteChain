@@ -58,6 +58,61 @@ function HeroLiveTerminal() {
         const contract=new ethersLib.Contract(CONTRACT_ADDRESS,CONTRACT_ABI,provider);
         contractRef.current=contract;
 
+        // Fetch recent historical events (last 1900 blocks)
+        try {
+          const currentBlock = await provider.getBlockNumber();
+          const fromBlock = Math.max(0, currentBlock - 1900);
+          push(mkLog('BOOT', `Scanning recent blocks for on-chain events...`));
+          
+          const voteFilter = contract.filters.VoteCast();
+          const registerFilter = contract.filters.VoterRegistered();
+          const createFilter = contract.filters.ElectionCreated();
+          const startFilter = contract.filters.ElectionStarted();
+          const endFilter = contract.filters.ElectionEnded();
+          
+          const [votes, registers, creations, starts, ends] = await Promise.all([
+            contract.queryFilter(voteFilter, fromBlock),
+            contract.queryFilter(registerFilter, fromBlock),
+            contract.queryFilter(createFilter, fromBlock),
+            contract.queryFilter(startFilter, fromBlock),
+            contract.queryFilter(endFilter, fromBlock)
+          ]);
+          
+          const allHistorical = [
+            ...votes.map(ev => ({ type: 'VOTE', block: ev.blockNumber, txIndex: ev.transactionIndex, log: ev })),
+            ...registers.map(ev => ({ type: 'REGISTER', block: ev.blockNumber, txIndex: ev.transactionIndex, log: ev })),
+            ...creations.map(ev => ({ type: 'ELECTION', block: ev.blockNumber, txIndex: ev.transactionIndex, log: ev })),
+            ...starts.map(ev => ({ type: 'ELECTION', block: ev.blockNumber, txIndex: ev.transactionIndex, log: ev })),
+            ...ends.map(ev => ({ type: 'ELECTION', block: ev.blockNumber, txIndex: ev.transactionIndex, log: ev }))
+          ].sort((a, b) => a.block - b.block || a.txIndex - b.txIndex);
+          
+          if (mounted && allHistorical.length > 0) {
+            push(mkLog('BOOT', `Loaded ${allHistorical.length} historical logs:`));
+            for (const item of allHistorical) {
+              const ev = item.log;
+              if (item.type === 'VOTE') {
+                const [eid, voter, candidateId] = ev.args;
+                push(mkLog('VOTE', `Vote → Candidate #${candidateId}`, `by ${short(voter)} · Election #${eid} (past event)`));
+              } else if (item.type === 'REGISTER') {
+                const [eid, voter] = ev.args;
+                push(mkLog('REGISTER', `Voter registered`, `${short(voter)} · Election #${eid} (past event)`));
+              } else if (ev.eventName === 'ElectionCreated') {
+                const [eid, title] = ev.args;
+                push(mkLog('ELECTION', `New election: "${title}" (ID #${eid})`));
+              } else if (ev.eventName === 'ElectionStarted') {
+                const [eid] = ev.args;
+                push(mkLog('ELECTION', `Election #${eid} started — voting is now OPEN`));
+              } else if (ev.eventName === 'ElectionEnded') {
+                const [eid] = ev.args;
+                push(mkLog('ELECTION', `Election #${eid} closed — polls are SHUT`));
+              }
+            }
+          }
+        } catch (histError) {
+          console.warn("Failed to fetch historical events:", histError);
+          push(mkLog('WARN', "Historical scan skipped (RPC range restriction)."));
+        }
+
         contract.on('VoteCast',(eid,voter,cid)=>{ if(!mounted)return; push(mkLog('VOTE',`Vote → Candidate #${cid}`,`by ${short(voter)} · Election #${eid}`)); });
         contract.on('VoterRegistered',(eid,voter)=>{ if(!mounted)return; push(mkLog('REGISTER',`Voter registered`,`${short(voter)} · Election #${eid}`)); });
         contract.on('ElectionStarted',(eid)=>{ if(!mounted)return; push(mkLog('ELECTION',`Election #${eid} STARTED`)); });
