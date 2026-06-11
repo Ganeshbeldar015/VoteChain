@@ -511,7 +511,7 @@ const AdminDashboard = () => {
                   />
                 </div>
 
-                <div>
+                 <div>
                   <label className="block text-xs uppercase tracking-wider text-muted font-bold mb-2 flex items-center">
                     <LinkIcon className="w-3.5 h-3.5 mr-1" /> Candidate Image URL (Optional)
                   </label>
@@ -520,8 +520,11 @@ const AdminDashboard = () => {
                     placeholder="e.g. https://images.unsplash.com/..."
                     value={candidateForm.imageUrl}
                     onChange={(e) => setCandidateForm({ ...candidateForm, imageUrl: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:outline-none focus:border-primary/50 transition-all"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:outline-none focus:border-primary/50 transition-all text-sm"
                   />
+                  <p className="text-[11px] text-zinc-500 mt-2 leading-relaxed">
+                    💡 <strong>Where to store photos:</strong> Upload candidate photos to free services like <a href="https://postimages.org/" target="_blank" rel="noreferrer" className="underline hover:text-zinc-300 font-semibold">Postimages</a>, <a href="https://imgur.com" target="_blank" rel="noreferrer" className="underline hover:text-zinc-300 font-semibold">Imgur</a>, or <a href="https://www.pinata.cloud/" target="_blank" rel="noreferrer" className="underline hover:text-zinc-300 font-semibold">Pinata (IPFS)</a> and paste the direct link. Alternatively, save files in the project's <code>public</code> folder and type <code>/filename.jpg</code>.
+                  </p>
                 </div>
 
                 <motion.button
