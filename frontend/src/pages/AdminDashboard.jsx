@@ -39,6 +39,7 @@ const AdminDashboard = () => {
   // Form states
   const [electionForm, setElectionForm] = useState({ title: '', description: '', startTime: '', endTime: '' });
   const [candidateForm, setCandidateForm] = useState({ electionId: '', name: '', party: '', imageUrl: '' });
+  const [partySelectValue, setPartySelectValue] = useState('');
   const [voterForm, setVoterForm] = useState({ electionId: '', voterAddress: '' });
   const [uploadingImage, setUploadingImage] = useState(false);
 
@@ -98,6 +99,7 @@ const AdminDashboard = () => {
       showMessage("Candidate added successfully!");
       setIsAddCandidateModalOpen(false);
       setCandidateForm({ electionId: '', name: '', party: '', imageUrl: '' });
+      setPartySelectValue('');
     } catch (error) {
       console.error(error);
       showMessage(error.reason || error.message || "Failed to add candidate", true);
@@ -244,7 +246,11 @@ const AdminDashboard = () => {
            <motion.button 
              whileHover={{ scale: 1.05 }}
              whileTap={{ scale: 0.95 }}
-             onClick={() => setIsAddCandidateModalOpen(true)}
+             onClick={() => {
+               setPartySelectValue('');
+               setCandidateForm({ electionId: '', name: '', party: '', imageUrl: '' });
+               setIsAddCandidateModalOpen(true);
+             }}
              className="bg-white/5 border border-white/10 px-6 py-3 rounded-2xl font-bold flex items-center space-x-2 text-sm"
            >
               <Plus className="w-4 h-4" />
@@ -544,7 +550,7 @@ const AdminDashboard = () => {
                   <label className="block text-xs uppercase tracking-wider text-muted font-bold mb-2">Candidate Name</label>
                   <input
                     type="text"
-                    placeholder="e.g. John Doe"
+                    placeholder="e.g. Ganesh Beldar"
                     value={candidateForm.name}
                     onChange={(e) => setCandidateForm({ ...candidateForm, name: e.target.value })}
                     className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:outline-none focus:border-primary/50 transition-all"
@@ -552,16 +558,40 @@ const AdminDashboard = () => {
                   />
                 </div>
 
-                <div>
+                 <div>
                   <label className="block text-xs uppercase tracking-wider text-muted font-bold mb-2">Party/Affiliation</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Democratic / Independent"
-                    value={candidateForm.party}
-                    onChange={(e) => setCandidateForm({ ...candidateForm, party: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:outline-none focus:border-primary/50 transition-all"
-                    required
-                  />
+                  <select
+                     value={partySelectValue}
+                     onChange={(e) => {
+                       const val = e.target.value;
+                       setPartySelectValue(val);
+                       if (val !== 'Other') {
+                         setCandidateForm(prev => ({ ...prev, party: val }));
+                       } else {
+                         setCandidateForm(prev => ({ ...prev, party: '' }));
+                       }
+                     }}
+                     className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:outline-none focus:border-primary/50 transition-all text-sm mb-3"
+                     required
+                  >
+                     <option value="" disabled className="bg-background text-zinc-400">Select Party...</option>
+                     <option value="Democratic" className="bg-background">Democratic</option>
+                     <option value="Independent" className="bg-background">Independent</option>
+                     <option value="Other" className="bg-background">Other (Type custom...)</option>
+                  </select>
+
+                  {partySelectValue === 'Other' && (
+                     <motion.input
+                       initial={{ opacity: 0, y: -10 }}
+                       animate={{ opacity: 1, y: 0 }}
+                       type="text"
+                       placeholder="Enter custom party name"
+                       value={candidateForm.party}
+                       onChange={(e) => setCandidateForm({ ...candidateForm, party: e.target.value })}
+                       className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:outline-none focus:border-primary/50 transition-all text-sm"
+                       required
+                     />
+                  )}
                 </div>
 
                  <div>
