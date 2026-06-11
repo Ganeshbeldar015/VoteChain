@@ -250,6 +250,15 @@ export const endElection = async (electionId) => {
 
 export const getAllElections = async () => {
   try {
+    const provider = getProvider();
+    if (!provider) return [];
+
+    const code = await provider.getCode(CONTRACT_ADDRESS);
+    if (code === "0x" || code === "0x0" || !code) {
+      console.warn("WARNING: The contract does not exist on the network MetaMask is currently connected to!");
+      return [];
+    }
+
     const contract = await getContract();
     const elections = [];
     let id = 1;
