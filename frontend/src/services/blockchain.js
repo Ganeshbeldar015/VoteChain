@@ -6,8 +6,22 @@ export const CONTRACT_ADDRESS = (import.meta.env.VITE_CONTRACT_ADDRESS || "0xYou
 window.ethers = ethers;
 window.CONTRACT_ADDRESS = CONTRACT_ADDRESS;
 
-// Contract ABI
+// Contract ABI including custom errors
 export const CONTRACT_ABI = [
+  // Custom Errors
+  "error VoteChain__InvalidTime()",
+  "error VoteChain__ElectionNotExists()",
+  "error VoteChain__ElectionNotActive()",
+  "error VoteChain__ElectionAlreadyActive()",
+  "error VoteChain__ElectionEnded()",
+  "error VoteChain__EmptyString()",
+  "error VoteChain__CandidateNotExists()",
+  "error VoteChain__VoterAlreadyRegistered()",
+  "error VoteChain__VoterNotRegistered()",
+  "error VoteChain__AlreadyVoted()",
+  "error AccessControlUnauthorizedAccount(address account, bytes32 neededRole)",
+
+  // Functions
   "function createElection(string title, string description, uint256 startTime, uint256 endTime) external returns (uint256)",
   "function addCandidate(uint256 electionId, string name, string party, string imageUrl) external",
   "function registerVoter(uint256 electionId, address voter) external",
@@ -24,6 +38,72 @@ export const CONTRACT_ABI = [
   "function totalCandidates(uint256 electionId) external view returns (uint256)",
   "function hasRole(bytes32 role, address account) external view returns (bool)"
 ];
+
+/**
+ * Parses Ethereum contract transaction errors to provide human-readable feedback.
+ */
+export const parseError = (error) => {
+  // Check if action was rejected by the user
+  if (
+    error.code === 'ACTION_REJECTED' || 
+    error.message?.includes('rejected') || 
+    error.message?.includes('User denied')
+  ) {
+    return 'Transaction rejected by user';
+  }
+
+  // Look for contract custom error details decoded by Ethers
+  if (error.code === 'CALL_EXCEPTION' || error.revert) {
+    const errorName = error.revert?.name || error.errorName;
+    if (errorName) {
+      switch (errorName) {
+        case 'VoteChain__InvalidTime':
+          return 'Invalid time: Start time must be in the future, and end time must be after start time.';
+        case 'VoteChain__ElectionNotExists':
+          return 'Election does not exist.';
+        case 'VoteChain__ElectionNotActive':
+          return 'Election is not currently active.';
+        case 'VoteChain__ElectionAlreadyActive':
+          return 'Election is already active.';
+        case 'VoteChain__ElectionEnded':
+          return 'Election has already ended.';
+        case 'VoteChain__EmptyString':
+          return 'Required field cannot be empty.';
+        case 'VoteChain__CandidateNotExists':
+          return 'Candidate does not exist.';
+        case 'VoteChain__VoterAlreadyRegistered':
+          return 'Voter is already registered for this election.';
+        case 'VoteChain__VoterNotRegistered':
+          return 'You are not registered to vote in this election.';
+        case 'VoteChain__AlreadyVoted':
+          return 'You have already cast your vote in this election.';
+        case 'AccessControlUnauthorizedAccount':
+          return 'Unauthorized: Connected wallet does not have permission to perform this action.';
+        default:
+          return `Contract error: ${errorName}`;
+      }
+    }
+
+    // Fallback: Check raw hex selector signatures if ABI decoding failed
+    const data = error.data || error.error?.data;
+    if (data && typeof data === 'string') {
+      if (data.includes('0x6fc9cba1')) return 'Invalid time: Start time must be in the future, and end time must be after start time.';
+      if (data.includes('0x9b22d9cb')) return 'Election does not exist.';
+      if (data.includes('0x3ccd0d5c')) return 'Election is not currently active.';
+      if (data.includes('0x70c307ee')) return 'Election is already active.';
+      if (data.includes('0xac069831')) return 'Election has already ended.';
+      if (data.includes('0xf34548e0')) return 'Required field cannot be empty.';
+      if (data.includes('0xff65b59a')) return 'Candidate does not exist.';
+      if (data.includes('0xab91d364')) return 'Voter is already registered for this election.';
+      if (data.includes('0xf79b2524')) return 'You are not registered to vote in this election.';
+      if (data.includes('0xc6167230')) return 'You have already cast your vote in this election.';
+      if (data.includes('0xe2517d3f')) return 'Unauthorized: Connected wallet does not have permission to perform this action.';
+    }
+  }
+
+  return error.reason || error.message || 'An unknown blockchain error occurred';
+};
+
 
 export const getProvider = () => {
   if (window.ethereum) {
@@ -87,7 +167,7 @@ export const castVote = async (electionId, candidateId) => {
     return tx.hash;
   } catch (error) {
     console.error("Error casting vote", error);
-    throw error;
+    throw new Error(parseError(error));
   }
 };
 
@@ -116,7 +196,7 @@ export const createElection = async (title, description, startTime, endTime) => 
     return tx.hash;
   } catch (error) {
     console.error("Error creating election", error);
-    throw error;
+    throw new Error(parseError(error));
   }
 };
 
@@ -128,7 +208,7 @@ export const addCandidate = async (electionId, name, party, imageUrl) => {
     return tx.hash;
   } catch (error) {
     console.error("Error adding candidate", error);
-    throw error;
+    throw new Error(parseError(error));
   }
 };
 
@@ -140,7 +220,7 @@ export const registerVoter = async (electionId, voterAddress) => {
     return tx.hash;
   } catch (error) {
     console.error("Error registering voter", error);
-    throw error;
+    throw new Error(parseError(error));
   }
 };
 
@@ -152,7 +232,7 @@ export const startElection = async (electionId) => {
     return tx.hash;
   } catch (error) {
     console.error("Error starting election", error);
-    throw error;
+    throw new Error(parseError(error));
   }
 };
 
@@ -164,7 +244,7 @@ export const endElection = async (electionId) => {
     return tx.hash;
   } catch (error) {
     console.error("Error ending election", error);
-    throw error;
+    throw new Error(parseError(error));
   }
 };
 

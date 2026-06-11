@@ -14,6 +14,11 @@ import {
 } from 'lucide-react';
 import { useWallet } from '../context/WalletContext';
 
+const getLocalISOString = (date) => {
+  const tzoffset = date.getTimezoneOffset() * 60000;
+  return new Date(date - tzoffset).toISOString().slice(0, 16);
+};
+
 const AdminDashboard = () => {
   const { 
     account, 
@@ -47,11 +52,22 @@ const AdminDashboard = () => {
   const handleCreateElection = async (e) => {
     e.preventDefault();
     try {
+      const nowUnix = Math.floor(Date.now() / 1000);
       const startUnix = Math.floor(new Date(electionForm.startTime).getTime() / 1000);
       const endUnix = Math.floor(new Date(electionForm.endTime).getTime() / 1000);
       
       if (isNaN(startUnix) || isNaN(endUnix)) {
         showMessage("Please select valid dates", true);
+        return;
+      }
+
+      if (startUnix <= nowUnix + 30) {
+        showMessage("Start time must be in the future (at least 1 minute from now)", true);
+        return;
+      }
+
+      if (endUnix <= startUnix) {
+        showMessage("End time must be after start time", true);
         return;
       }
 
@@ -398,6 +414,7 @@ const AdminDashboard = () => {
                       type="datetime-local"
                       value={electionForm.startTime}
                       onChange={(e) => setElectionForm({ ...electionForm, startTime: e.target.value })}
+                      min={getLocalISOString(new Date(Date.now() + 60000))}
                       className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:outline-none focus:border-primary/50 transition-all text-sm"
                       required
                     />
@@ -408,6 +425,7 @@ const AdminDashboard = () => {
                       type="datetime-local"
                       value={electionForm.endTime}
                       onChange={(e) => setElectionForm({ ...electionForm, endTime: e.target.value })}
+                      min={electionForm.startTime ? getLocalISOString(new Date(new Date(electionForm.startTime).getTime() + 60000)) : getLocalISOString(new Date(Date.now() + 120000))}
                       className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:outline-none focus:border-primary/50 transition-all text-sm"
                       required
                     />
