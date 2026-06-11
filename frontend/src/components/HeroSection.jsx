@@ -26,7 +26,7 @@ const LOG_TYPES = {
 const MAX_LOGS = 40;
 function fmtTime(d){ return d.toLocaleTimeString('en-US',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
 function short(a){ return a?.length>10?`${a.slice(0,6)}…${a.slice(-4)}`:a; }
-function mkLog(type, msg, sub){ return { id: Date.now()+Math.random(), time: fmtTime(new Date()), type, msg, sub }; }
+function mkLog(type, msg, sub, customTime){ return { id: Date.now()+Math.random(), time: customTime || fmtTime(new Date()), type, msg, sub }; }
 
 function HeroLiveTerminal() {
   const [logs, setLogs] = useState([]);
@@ -87,6 +87,20 @@ function HeroLiveTerminal() {
           ].sort((a, b) => a.block - b.block || a.txIndex - b.txIndex);
           
           if (mounted && allHistorical.length > 0) {
+            // Get unique block numbers and query their timestamps in parallel
+            const blockNums = [...new Set(allHistorical.map(item => item.block))];
+            const blockTimes = {};
+            await Promise.all(blockNums.map(async (num) => {
+              try {
+                const b = await provider.getBlock(num);
+                if (b && b.timestamp) {
+                  blockTimes[num] = new Date(b.timestamp * 1000);
+                }
+              } catch (e) {
+                console.warn(`Failed to fetch block #${num} timestamp:`, e);
+              }
+            }));
+
             // Pre-fetch candidate maps for historical events
             const eids = [...new Set(allHistorical.filter(item => item.type === 'VOTE').map(item => Number(item.log.args[0])))];
             const candidateMaps = {};
@@ -102,23 +116,24 @@ function HeroLiveTerminal() {
             push(mkLog('BOOT', `Loaded ${allHistorical.length} historical logs:`));
             for (const item of allHistorical) {
               const ev = item.log;
+              const eventTime = blockTimes[ev.blockNumber] ? fmtTime(blockTimes[ev.blockNumber]) : fmtTime(new Date());
               if (item.type === 'VOTE') {
                 const [eid, voter, candidateId] = ev.args;
                 const candList = candidateMaps[Number(eid)] || [];
                 const candName = candList.find(c => Number(c.id) === Number(candidateId))?.name || `Candidate #${candidateId}`;
-                push(mkLog('VOTE', `Vote → ${candName}`, `by ${short(voter)} · Election #${eid} (past event)`));
+                push(mkLog('VOTE', `Vote → ${candName}`, `by ${short(voter)} · Election #${eid} (past event)`, eventTime));
               } else if (item.type === 'REGISTER') {
                 const [eid, voter] = ev.args;
-                push(mkLog('REGISTER', `Voter registered`, `${short(voter)} · Election #${eid} (past event)`));
+                push(mkLog('REGISTER', `Voter registered`, `${short(voter)} · Election #${eid} (past event)`, eventTime));
               } else if (ev.eventName === 'ElectionCreated') {
                 const [eid, title] = ev.args;
-                push(mkLog('ELECTION', `New election: "${title}" (ID #${eid})`));
+                push(mkLog('ELECTION', `New election: "${title}" (ID #${eid})`, null, eventTime));
               } else if (ev.eventName === 'ElectionStarted') {
                 const [eid] = ev.args;
-                push(mkLog('ELECTION', `Election #${eid} started — voting is now OPEN`));
+                push(mkLog('ELECTION', `Election #${eid} started — voting is now OPEN`, null, eventTime));
               } else if (ev.eventName === 'ElectionEnded') {
                 const [eid] = ev.args;
-                push(mkLog('ELECTION', `Election #${eid} closed — polls are SHUT`));
+                push(mkLog('ELECTION', `Election #${eid} closed — polls are SHUT`, null, eventTime));
               }
             }
           }

@@ -32,9 +32,10 @@ function shortAddr(addr) {
 }
 
 function makeEntry(type, message, extra = {}) {
+  const entryTime = extra.time || fmt(new Date());
   return {
     id: Date.now() + Math.random(),
-    time: fmt(new Date()),
+    time: entryTime,
     type,
     message,
     ...extra,
@@ -136,6 +137,20 @@ export default function LiveTerminalFeed({ electionId, candidatesData = [] }) {
           ].sort((a, b) => a.block - b.block || a.txIndex - b.txIndex);
           
           if (mounted && allHistorical.length > 0) {
+            // Get unique block numbers and query their timestamps in parallel
+            const blockNums = [...new Set(allHistorical.map(item => item.block))];
+            const blockTimes = {};
+            await Promise.all(blockNums.map(async (num) => {
+              try {
+                const b = await provider.getBlock(num);
+                if (b && b.timestamp) {
+                  blockTimes[num] = new Date(b.timestamp * 1000);
+                }
+              } catch (e) {
+                console.warn(`Failed to fetch block #${num} timestamp:`, e);
+              }
+            }));
+
             // Pre-fetch candidate maps for historical events
             const eids = [...new Set(allHistorical.filter(item => item.type === 'VOTE').map(item => Number(item.log.args[0])))];
             const candidateMaps = {};
@@ -151,6 +166,7 @@ export default function LiveTerminalFeed({ electionId, candidatesData = [] }) {
             push(makeEntry('BOOT', `Loaded ${allHistorical.length} historical logs:`));
             for (const item of allHistorical) {
               const ev = item.log;
+              const eventTime = blockTimes[ev.blockNumber] ? fmt(blockTimes[ev.blockNumber]) : fmt(new Date());
               if (item.type === 'VOTE') {
                 const [eid, voter, candidateId] = ev.args;
                 // Try to find in custom candidatesData if same election first, else use candidateMaps
@@ -163,19 +179,19 @@ export default function LiveTerminalFeed({ electionId, candidatesData = [] }) {
                   const candList = candidateMaps[Number(eid)] || [];
                   candName = candList.find(c => Number(c.id) === Number(candidateId))?.name || `Candidate #${candidateId}`;
                 }
-                push(makeEntry('VOTE', `Vote cast → ${candName}`, { sub: `by ${shortAddr(voter)} on Election #${eid} (past event)` }));
+                push(makeEntry('VOTE', `Vote cast → ${candName}`, { time: eventTime, sub: `by ${shortAddr(voter)} on Election #${eid} (past event)` }));
               } else if (item.type === 'REGISTER') {
                 const [eid, voter] = ev.args;
-                push(makeEntry('REGISTER', `Voter registered`, { sub: `${shortAddr(voter)} on Election #${eid} (past event)` }));
+                push(makeEntry('REGISTER', `Voter registered`, { time: eventTime, sub: `${shortAddr(voter)} on Election #${eid} (past event)` }));
               } else if (ev.eventName === 'ElectionCreated') {
                 const [eid, title] = ev.args;
-                push(makeEntry('ELECTION', `New election: "${title}" (ID #${eid})`));
+                push(makeEntry('ELECTION', `New election: "${title}" (ID #${eid})`, { time: eventTime }));
               } else if (ev.eventName === 'ElectionStarted') {
                 const [eid] = ev.args;
-                push(makeEntry('ELECTION', `Election #${eid} started — voting is now OPEN`));
+                push(makeEntry('ELECTION', `Election #${eid} started — voting is now OPEN`, { time: eventTime }));
               } else if (ev.eventName === 'ElectionEnded') {
                 const [eid] = ev.args;
-                push(makeEntry('ELECTION', `Election #${eid} closed — polls are SHUT`));
+                push(makeEntry('ELECTION', `Election #${eid} closed — polls are SHUT`, { time: eventTime }));
               }
             }
           }
