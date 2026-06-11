@@ -565,11 +565,7 @@ const AdminDashboard = () => {
                      onChange={(e) => {
                        const val = e.target.value;
                        setPartySelectValue(val);
-                       if (val !== 'Other') {
-                         setCandidateForm(prev => ({ ...prev, party: val }));
-                       } else {
-                         setCandidateForm(prev => ({ ...prev, party: '' }));
-                       }
+                       setCandidateForm(prev => ({ ...prev, party: '' }));
                      }}
                      className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:outline-none focus:border-primary/50 transition-all text-sm mb-3"
                      required
@@ -585,7 +581,7 @@ const AdminDashboard = () => {
                        initial={{ opacity: 0, y: -10 }}
                        animate={{ opacity: 1, y: 0 }}
                        type="text"
-                       placeholder={partySelectValue === 'Other' ? "Enter custom party name" : "Confirm or edit party name"}
+                       placeholder={partySelectValue === 'Other' ? "Enter custom party name" : `Enter ${partySelectValue} party name`}
                        value={candidateForm.party}
                        onChange={(e) => setCandidateForm({ ...candidateForm, party: e.target.value })}
                        className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:outline-none focus:border-primary/50 transition-all text-sm"
