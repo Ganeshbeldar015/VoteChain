@@ -3,8 +3,6 @@ import { ethers } from 'ethers';
 // Contract Address (Replace with deployed address)
 export const CONTRACT_ADDRESS = (import.meta.env.VITE_CONTRACT_ADDRESS || "0xYourDeployedContractAddressHere").replace(/['"]/g, '').trim();
 
-window.ethers = ethers;
-window.CONTRACT_ADDRESS = CONTRACT_ADDRESS;
 
 // Contract ABI including custom errors
 export const CONTRACT_ABI = [
