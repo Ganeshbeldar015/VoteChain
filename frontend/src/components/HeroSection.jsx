@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { 
   Server, 
   Sparkles,
@@ -288,33 +288,19 @@ function HeroLiveTerminal() {
 }
 
 const HeroSection = () => {
+  const { scrollY } = useScroll();
+  const scale = useTransform(scrollY, [0, 600], [1, 1.15]);
+  const y = useTransform(scrollY, [0, 600], [0, 50]);
+
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden bg-background pt-20 pb-12">
-      {/* Background Grid and Glows */}
+      {/* Background Image */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        {/* Subtle grid pattern */}
-        <div 
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage: `
-              linear-gradient(to right, rgba(0, 0, 0, 0.1) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 1px, transparent 1px)
-            `,
-            backgroundSize: '40px 40px',
-          }}
-        />
-        {/* Soft radial color glow spots */}
-        <div 
-          className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-[120px] opacity-[0.05]"
-          style={{
-            background: 'radial-gradient(circle, #7c3aed 0%, transparent 80%)',
-          }}
-        />
-        <div 
-          className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-[500px] h-[500px] rounded-full blur-[120px] opacity-[0.05]"
-          style={{
-            background: 'radial-gradient(circle, #2563eb 0%, transparent 80%)',
-          }}
+        <motion.img 
+          src="/blockchain-img.jpg" 
+          alt="Blockchain background" 
+          style={{ scale, y }}
+          className="w-full h-full object-cover opacity-[0.18]"
         />
       </div>
       
