@@ -46,8 +46,7 @@ h1, h2, h3, h4, h5, h6 {
 .glass-card h3:not([class*="text-"]), 
 .glass-card h4:not([class*="text-"]), 
 .glass-card h5:not([class*="text-"]), 
-.glass-card h6:not([class*="text-"]), 
-.glass-card span:not([class*="text-"]):not(.text-white):not(.text-green-400):not(.text-blue-400):not(.text-red-400) {
+.glass-card h6:not([class*="text-"]) {
   color: #18181B !important;
 }
 
