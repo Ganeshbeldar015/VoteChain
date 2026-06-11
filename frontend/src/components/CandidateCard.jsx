@@ -12,11 +12,11 @@ const CandidateCard = ({ candidate, onVote, isSelected }) => {
       }`}
     >
       <div className="relative mb-6">
-        <div className="w-full aspect-square rounded-2xl bg-gradient-to-br from-white/5 to-white/10 flex items-center justify-center overflow-hidden">
-           {image ? (
+        <div className="w-full aspect-square rounded-2xl bg-zinc-50 border border-zinc-100 flex items-center justify-center overflow-hidden">
+           {image && image !== "" && !image.includes("unsplash.com/photo-1540910419892-4a36d2c3266c") ? (
              <img src={image} alt={name} className="w-full h-full object-cover" />
            ) : (
-             <User className="w-20 h-20 text-muted/30" />
+             <User className="w-20 h-20 text-zinc-300" />
            )}
         </div>
         {isSelected && (

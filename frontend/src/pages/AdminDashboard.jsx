@@ -92,7 +92,7 @@ const AdminDashboard = () => {
         Number(candidateForm.electionId), 
         candidateForm.name, 
         candidateForm.party, 
-        candidateForm.imageUrl || "https://images.unsplash.com/photo-1540910419892-4a36d2c3266c?q=80&w=200&h=200&fit=crop"
+        candidateForm.imageUrl || ""
       );
       showMessage("Candidate added successfully!");
       setIsAddCandidateModalOpen(false);
