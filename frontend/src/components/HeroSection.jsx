@@ -80,7 +80,7 @@ function HeroLiveTerminal() {
         display:'flex', alignItems:'center', justifyContent:'space-between',
         marginBottom:10, padding:'6px 10px',
         background:'#0f0f1a', borderRadius:'0.75rem',
-        border:'1px solid rgba(124,58,237,0.2)',
+        border:'1px solid rgba(124,58,237,0.25)',
       }}>
         {/* traffic lights */}
         <div style={{ display:'flex', gap:5 }}>
@@ -88,7 +88,7 @@ function HeroLiveTerminal() {
           <span style={{ width:9,height:9,borderRadius:'50%',background:'#febc2e',display:'block' }}/>
           <span style={{ width:9,height:9,borderRadius:'50%',background:'#28c840',display:'block' }}/>
         </div>
-        <span style={{ color:'#475569', fontSize:10, display:'flex', alignItems:'center', gap:5 }}>
+        <span style={{ color:'#94a3b8', fontSize:10, display:'flex', alignItems:'center', gap:5 }}>
           <Terminal size={10}/> VoteChain Event Daemon
         </span>
         <div style={{ display:'flex', alignItems:'center', gap:4, fontSize:10 }}>
@@ -96,7 +96,7 @@ function HeroLiveTerminal() {
           <span style={{ color:connected?'#34d399':'#ef4444', fontWeight:700, letterSpacing:'0.05em' }}>
             {connected ? 'LIVE' : 'OFFLINE'}
           </span>
-          <span style={{ color:'#334155', marginLeft:4 }}>{events} ev</span>
+          <span style={{ color:'#64748b', marginLeft:4 }}>{events} ev</span>
         </div>
       </div>
 
@@ -106,15 +106,15 @@ function HeroLiveTerminal() {
         onScroll={()=>{ if(!bodyRef.current)return; const {scrollTop,scrollHeight,clientHeight}=bodyRef.current; setAutoScroll(scrollTop+clientHeight>=scrollHeight-16); }}
         style={{
           height:230, overflowY:'auto',
-          background:'#0a0a14',
+          background:'#05070c',
           borderRadius:'0.75rem',
-          border:'1px solid rgba(124,58,237,0.15)',
+          border:'1px solid rgba(124,58,237,0.25)',
           padding:'10px 12px',
           display:'flex', flexDirection:'column', gap:1,
           scrollbarWidth:'thin', scrollbarColor:'rgba(124,58,237,0.2) transparent',
         }}
       >
-        <div style={{ color:'#4c1d95', fontSize:10, marginBottom:6, letterSpacing:'0.04em' }}>
+        <div style={{ color:'#c084fc', fontSize:10, marginBottom:6, letterSpacing:'0.04em' }}>
           ─── Realtime Blockchain Event Monitor ───
         </div>
 
@@ -130,14 +130,14 @@ function HeroLiveTerminal() {
                 style={{ fontSize:10.5, marginBottom:1 }}
               >
                 <div style={{ display:'flex', gap:7, alignItems:'baseline' }}>
-                  <span style={{ color:'#2d3748', minWidth:58, flexShrink:0 }}>[{e.time}]</span>
+                  <span style={{ color:'#64748b', minWidth:58, flexShrink:0 }}>[{e.time}]</span>
                   <span style={{ color:t.color, minWidth:12, flexShrink:0 }}>{t.icon}</span>
-                  <span style={{ color: e.type==='VOTE' ? '#e2e8f0' : e.type==='WARN' ? '#fca5a5' : '#94a3b8' }}>
+                  <span style={{ color: e.type==='WARN' ? '#fca5a5' : '#f1f5f9' }}>
                     {e.msg}
                   </span>
                 </div>
                 {e.sub && (
-                  <div style={{ paddingLeft:77, fontSize:9.5, color:'#2d3748' }}>└─ {e.sub}</div>
+                  <div style={{ paddingLeft:77, fontSize:9.5, color:'#94a3b8' }}>└─ {e.sub}</div>
                 )}
               </motion.div>
             );
@@ -146,11 +146,11 @@ function HeroLiveTerminal() {
 
         {/* blinking cursor */}
         <div style={{ display:'flex', alignItems:'center', gap:5, marginTop:4 }}>
-          <span style={{ color:'#2d3748', fontSize:10.5 }}>$</span>
+          <span style={{ color:'#64748b', fontSize:10.5 }}>$</span>
           <motion.span
             animate={{ opacity:[1,0,1] }}
             transition={{ duration:1.1, repeat:Infinity }}
-            style={{ display:'inline-block', width:6, height:11, background:connected?'#34d399':'#2d3748', borderRadius:2 }}
+            style={{ display:'inline-block', width:6, height:11, background:connected?'#34d399':'#64748b', borderRadius:2 }}
           />
         </div>
       </div>
