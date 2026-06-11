@@ -580,12 +580,12 @@ const AdminDashboard = () => {
                      <option value="Other" className="bg-background">Other (Type custom...)</option>
                   </select>
 
-                  {partySelectValue === 'Other' && (
+                  {partySelectValue !== '' && (
                      <motion.input
                        initial={{ opacity: 0, y: -10 }}
                        animate={{ opacity: 1, y: 0 }}
                        type="text"
-                       placeholder="Enter custom party name"
+                       placeholder={partySelectValue === 'Other' ? "Enter custom party name" : "Confirm or edit party name"}
                        value={candidateForm.party}
                        onChange={(e) => setCandidateForm({ ...candidateForm, party: e.target.value })}
                        className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white focus:outline-none focus:border-primary/50 transition-all text-sm"
