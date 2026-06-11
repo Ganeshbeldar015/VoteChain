@@ -310,6 +310,16 @@ export default function LiveTerminalFeed({ electionId, candidatesData = [] }) {
       boxShadow: '0 0 40px rgba(124,58,237,0.08), 0 2px 0 rgba(255,255,255,0.04) inset',
       fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Courier New', monospace",
     }}>
+      <style>{`
+        .terminal-log-container *::selection {
+          background: rgba(167, 139, 250, 0.35) !important;
+          color: #ffffff !important;
+        }
+        .terminal-log-container *::-moz-selection {
+          background: rgba(167, 139, 250, 0.35) !important;
+          color: #ffffff !important;
+        }
+      `}</style>
 
       {/* ── Title bar ── */}
       <div style={{
@@ -356,6 +366,7 @@ export default function LiveTerminalFeed({ electionId, candidatesData = [] }) {
       <div
         ref={terminalRef}
         onScroll={handleScroll}
+        className="terminal-log-container"
         style={{
           height: '340px', overflowY: 'auto', padding: '16px 20px',
           display: 'flex', flexDirection: 'column', gap: '2px',

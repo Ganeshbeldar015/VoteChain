@@ -174,6 +174,16 @@ function HeroLiveTerminal() {
 
   return (
     <div style={{ fontFamily:"'JetBrains Mono','Fira Code','Courier New',monospace" }}>
+      <style>{`
+        .terminal-log-container *::selection {
+          background: rgba(167, 139, 250, 0.35) !important;
+          color: #ffffff !important;
+        }
+        .terminal-log-container *::-moz-selection {
+          background: rgba(167, 139, 250, 0.35) !important;
+          color: #ffffff !important;
+        }
+      `}</style>
 
       {/* ── Status bar inside the card ── */}
       <div style={{
@@ -204,6 +214,7 @@ function HeroLiveTerminal() {
       <div
         ref={bodyRef}
         onScroll={()=>{ if(!bodyRef.current)return; const {scrollTop,scrollHeight,clientHeight}=bodyRef.current; setAutoScroll(scrollTop+clientHeight>=scrollHeight-16); }}
+        className="terminal-log-container"
         style={{
           height:230, overflowY:'auto',
           background:'#05070c',
