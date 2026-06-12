@@ -1,8 +1,6 @@
 # VoteChain: Web3 React Frontend
 
-<p align="center">
-  <img src="src/assets/votechain_banner.png" alt="VoteChain Banner" width="100%" />
-</p>
+
 
 Welcome to the **VoteChain** frontend. This directory contains the user interface for the decentralized e-voting system, built as a premium single-page application (SPA) using **React**, **Vite**, **Tailwind CSS**, and **Ethers.js**. It integrates directly with the Ethereum Virtual Machine (EVM) smart contract via browser extensions like **MetaMask**.
 

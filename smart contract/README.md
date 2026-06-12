@@ -1,9 +1,5 @@
 # VoteChain: Smart Contracts
 
-<p align="center">
-  <img src="../frontend/src/assets/votechain_banner.png" alt="VoteChain Banner" width="100%" />
-</p>
-
 Welcome to the **VoteChain** smart contracts directory. This folder contains the Ethereum-based smart contract implementation of the decentralized e-voting system, built on **Solidity 0.8.24** using the **Hardhat** development framework and **OpenZeppelin** contract libraries.
 
 ---
