@@ -1,166 +1,252 @@
-# VoteChain: Decentralized E-Voting System using Blockchain
+# VoteChain: Secure & Decentralized E-Voting System
 
-Welcome to **VoteChain**, a secure, transparent, and immutable electronic voting system powered by decentralized blockchain technology. This document outlines the project's conceptual design, architectural components, implementation details, and deployment guidelines.
+![VoteChain Banner](frontend/src/assets/votechain_banner.png)
 
----
-
-## 📖 1. Project Abstract
-Online voting is a trend that is gaining momentum in modern society. It has great potential to decrease organizational costs and increase voter turnout by eliminating the need to print ballot papers or open physical polling stations—voters can cast their votes from anywhere with an Internet connection. 
-
-Despite these benefits, traditional online voting solutions are viewed with caution due to centralized vulnerabilities: a single security breach can lead to large-scale vote manipulation. To be viable, electronic voting systems must be **legitimate, accurate, safe, and convenient**.
-
-**VoteChain** addresses these critical security and transparency requirements by leveraging **Blockchain technology**. By using decentralized nodes and smart contracts, VoteChain provides end-to-end verification, non-repudiation, and auditability. The system uses a permissioned approach and consensus algorithms to guarantee security, maintain voter anonymity, and deliver high transaction throughput.
+Welcome to **VoteChain**, an advanced, secure, and transparent electronic voting system built on decentralized blockchain technology. This repository hosts a complete decentralized application (dApp) containing Ethereum-based smart contracts and a premium React-Vite web frontend.
 
 ---
 
-## 🎯 2. Introduction & Motivation
-Voting forms the basis of democracy. However, current systems—both paper-based and traditional electronic voting—face issues regarding transparency, auditability, and trust. Direct Recording Electronic (DRE) voting machines often do not generate verifiable receipts, and recounting processes lack public transparency.
+## 📖 1. Project Abstract & Motivation
 
-### ❖ Key Features of VoteChain Blockchain
-*   **High Availability:** Distributed ledger guarantees that the system is resilient to single-point-of-failure attacks.
-*   **Verifiability:** Voters can verify that their vote was recorded and counted without exposing their identity.
-*   **Transparency:** Publicly verifiable election logic using open-source Ethereum Smart Contracts.
-*   **Immutability:** Once written to the blockchain, voting logs cannot be altered, deleted, or falsified.
-*   **Distributed Ledgers:** Copies of the ledger are synchronized across validating nodes.
-*   **Decentralized:** Eliminates dependency on a central database/authority prone to corruption.
-*   **Enhanced Security:** Cryptographic hashing and digital signatures secure all voter records and transactions.
+Voting is the cornerstone of democracy, yet traditional voting systems—both paper-based and digital—face issues of trust, auditing integrity, high organization costs, and security vulnerabilities. Centralized digital voting systems are highly susceptible to database breaches and administrator manipulation.
+
+**VoteChain** addresses these critical vulnerabilities by employing a distributed ledger and immutable smart contracts:
+*   **Tamper-Proof Ledger:** Every vote is cast as a transaction, verified by network validators, and recorded immutably.
+*   **Voter Anonymity & Privacy:** Voters are identified by cryptographic public addresses; voting choices are decoupled from personal identity details on-chain.
+*   **Real-Time Auditability:** The election logic is defined by public smart contracts, enabling candidates and citizens to perform independent audits of the votes in real time.
+*   **Role-Based Administration:** Election creation, candidate registration, and voter authorization are strictly governed via role-based access control.
 
 ---
 
-## 🔭 3. System Scope
-The scope of VoteChain is highly adaptable and can be scaled to fit:
-*   **University & School Elections:** Electing student representatives.
-*   **Corporate & Organization Governance:** Shareholder voting and board elections.
-*   **Local Governance & Civil Bodies:** Public polling and administrative elections.
+## 🛠️ 2. System Architecture & Workflow
 
-VoteChain implements strong encryption techniques to protect voter privacy while generating completely tamper-free results.
+VoteChain's architecture connects a **Vite + React Frontend** directly to an **Ethereum Virtual Machine (EVM) Smart Contract** written in **Solidity** using the **Ethers.js** library and **MetaMask** wallet.
 
----
-
-## 🛠️ 4. System Architecture & Workflow
-
-The architecture splits logic between a **Vite + React Frontend** and an **Ethereum Virtual Machine (EVM) Smart Contract** written in **Solidity**.
-
-### 📊 Voter & Admin Flow Diagram
+### 📊 System Workflow Diagram
 
 ```mermaid
 graph TD
-    %% Define actors and states
-    Admin([Election Admin]) -->|1. Creates Election| SC[VoteChain Smart Contract]
-    Admin -->|2. Registers Voters| SC
+    %% Roles & Actors
+    Admin([Election Admin]) -->|1. Creates Election / Registers Candidates| SC[VoteChain Smart Contract]
+    Admin -->|2. Authorizes Voter Address| SC
     
     Voter([Voter]) -->|3. Connects Wallet| MetaMask[MetaMask Wallet]
-    MetaMask -->|4. Authenticates Identity| Frontend[React Web App]
-    Frontend -->|5. Submits Vote| SC
+    MetaMask -->|4. Authenticates & Loads Profile| Frontend[React Web App]
+    Frontend -->|5. Submits Cryptographic Ballot| SC
     
-    SC -->|6. Verifies Voter Registration| SC
-    SC -->|7. Records Vote Immutably| Blockchain[(Ledger / Block)]
+    %% Contract Actions
+    SC -->|6. Checks Role & Registration| SC
+    SC -->|7. Records Vote Immutably| Blockchain[(EVM Ledger / Block)]
     SC -->|8. Emits VoteCast Event| Frontend
     
+    %% Tallying & Resolution
     Admin -->|9. Ends Election| SC
-    Frontend -->|10. Queries Results| SC
+    Frontend -->|10. Renders Real-Time Results| SC
 ```
 
 ### 🔐 Transaction Verification Lifecycle
-1.  **Authentication:** Voter logs in via MetaMask using their private key.
-2.  **State Check:** The smart contract checks if the voter is registered and has not voted yet.
-3.  **Vote Submission:** The voter casts their vote; a transaction hash is generated.
-4.  **Consensus:** Validating nodes approve the block containing the vote.
-5.  **Tallying:** The smart contract updates the candidate's vote count in real-time, instantly visible after the block is mined.
+1.  **Authorization:** The Admin uses the smart contract to pre-register voter addresses for an election.
+2.  **Wallet Connection:** The voter connects MetaMask to the web app, verifying their active address.
+3.  **Validation Check:** The smart contract checks if the caller is registered and hasn't voted yet.
+4.  **Transaction Execution:** The voter signs a transaction selecting a candidate; the transaction is sent to the blockchain.
+5.  **Consensus & Mining:** The transaction is included in a block, updating candidate tallies and emitting block events.
+6.  **Real-Time Update:** The frontend listens to the `VoteCast` event and updates live stats instantly.
 
 ---
 
-## ⛓️ 5. Blockchain Network Design
+## ⛓️ 3. Smart Contract Design
 
-VoteChain is designed to operate on a **Permissioned Hybrid/Private Blockchain** utilizing the **Proof of Authority (PoA)** consensus algorithm.
+The smart contract is written in **Solidity (^0.8.24)** and uses **OpenZeppelin** libraries to ensure security, standard compatibility, and optimal gas utilization.
 
-| Blockchain Type | Access Restrictions | Transaction Speed | Verification Costs | Ideal Use Case |
-| :--- | :--- | :--- | :--- | :--- |
-| **Public** | None (Anyone can join) | Slower | High Gas Fees | Public DeFi, Bitcoin, Ethereum Mainnet |
-| **Private/Permissioned** | Strict (Admin Invitation) | Very Fast | Zero/Low Gas Fees | Enterprise, VoteChain local/private nodes |
-| **Hybrid** | Mixed (Public Read / Private Write) | Fast | Moderate | Cross-organization consensus |
+### 🗂️ Contract File
+*   [VoteChain.sol](smart%20contract/contracts/VoteChain.sol)
 
-### Why Proof of Authority (PoA)?
-*   **High Performance:** Transactions are approved by designated validators, leading to short block times and high throughput.
-*   **Zero/Predictable Cost:** Eliminates expensive transaction fees typical of public proof-of-work/stake blockchains.
-*   **Access Control:** Only authorized citizens/voters can interact, preventing external network spamming.
-*   **Privacy Preservation:** Voter identity data remains off-chain or heavily encrypted, with only anonymous cryptographic keys interacting with the ledger.
+### 🧩 Structural Components
+
+#### 1. Data Structures
+*   `Candidate`: Holds identifier (`id`), display `name`, political `party`, candidate `imageUrl` representation, `voteCount`, and an existence flag.
+*   `Voter`: Tracks registration status (`isRegistered`), vote tracking (`hasVoted`), and the selected candidate ID (`votedCandidateId`).
+*   `Election`: Represents an election instance containing a metadata title, description, time boundaries (`startTime`/`endTime`), active state, total votes cast, and list of associated candidate IDs.
+*   `ElectionStatus` (Enum): Manages election lifecycle phase: `NotStarted`, `Active`, `Ended`.
+
+#### 2. Key Custom Errors (Gas-Optimized)
+Instead of expensive string-based reverts, the contract employs custom errors:
+*   `VoteChain__InvalidTime()`: Triggered when start/end bounds are illogical or in the past.
+*   `VoteChain__ElectionNotExists()`: Querying or interacting with a non-existent election ID.
+*   `VoteChain__ElectionNotActive()`: Attempting to vote when the status is not `Active`.
+*   `VoteChain__ElectionAlreadyActive()`: Trying to start an election that has already run.
+*   `VoteChain__ElectionEnded()`: Voting after the block time exceeds the election's `endTime`.
+*   `VoteChain__CandidateNotExists()`: Voting for a candidate ID that isn't registered.
+*   `VoteChain__VoterAlreadyRegistered()`: Attempting to register an authorized voter twice.
+*   `VoteChain__VoterNotRegistered()`: Non-registered caller attempting to vote.
+*   `VoteChain__AlreadyVoted()`: Voter attempting to submit multiple ballots in the same election.
+
+#### 3. Administrative Functions (Role-Based)
+Governed by `ELECTION_MANAGER_ROLE` and `DEFAULT_ADMIN_ROLE`:
+*   `createElection(title, description, startTime, endTime)`: Registers a new election layout.
+*   `addCandidate(electionId, name, party, imageUrl)`: Appends a candidate to an election.
+*   `registerVoter(electionId, voter)`: Grants voting authorization to a specific public key address.
+*   `startElection(electionId)` / `endElection(electionId)`: Manually triggers lifecycle shifts overriding standard block times.
+*   `pause()` / `unpause()`: Inherited from `Pausable` for administrative emergency overrides.
+
+#### 4. Public View Functions
+*   `getAllCandidates(electionId)`: Retrieves all registered candidates.
+*   `getWinner(electionId)`: Returns the leading candidate model for an election.
+*   `getElectionDetails(electionId)`: Fetches configuration parameters of the election.
+*   `isRegisteredVoter(electionId, voter)` / `hasVoted(electionId, voter)`: Public validation statuses.
 
 ---
 
-## 💻 6. Implementation Tech Stack
+## 💻 4. Frontend Application
 
-### Tools & Technologies
-*   **Solidity:** Language used to write the `VoteChain` smart contract, ensuring immutable execution of election rules.
-*   **Hardhat:** Node.js development environment used to compile, test, and deploy smart contracts.
-*   **MetaMask Wallet:** Browser extension used by voters and admins to sign transactions securely.
-*   **Ethers.js:** Library connecting the frontend user interface to the EVM network.
-*   **React + Vite:** Premium frontend framework for building a responsive, high-performance web dashboard.
+The user interface is built as a single-page app utilizing **React**, **Vite**, and **Tailwind CSS**, designed with a premium zinc-based glassmorphism layout (high contrast, minimalist dark details, and smooth micro-animations).
+
+### 🗂️ Architecture Layout
+*   [blockchain.js](frontend/src/services/blockchain.js): Main service library containing the compiled contract ABI, custom hex selector error mapping, and low-level Ethers.js providers.
+*   [WalletContext.jsx](frontend/src/context/WalletContext.jsx): React Context Provider managing MetaMask accounts, loading indicators, active role state (`isAdmin`), and wrapping smart contract operations with local callback state synchronization.
+*   [index.css](frontend/src/index.css): Implements core layout variables, premium scrollbars, typography overrides (Inter & Syne fonts), and custom card components (`.glass-card`).
+
+### 📑 User Interface Pages
+*   **Home Dashboard ([Home.jsx](frontend/src/pages/Home.jsx)):** Landing page detailing project metrics, live connection status, and direct call-to-actions.
+*   **Elections Overview ([Elections.jsx](frontend/src/pages/Elections.jsx)):** Search and view lists of current, upcoming, and past elections.
+*   **Candidate Panel ([Candidates.jsx](frontend/src/pages/Candidates.jsx)):** View candidates and profiles before voting.
+*   **Voting Booth ([VotePage.jsx](frontend/src/pages/VotePage.jsx)):** Secure casting panel verifying registration, status checks, and sending transaction request payloads to MetaMask.
+*   **Real-time Results ([Results.jsx](frontend/src/pages/Results.jsx)):** Renders candidate tallies, voting percentages, and highlights current winners using beautiful CSS graph components.
+*   **Admin Dashboard ([AdminDashboard.jsx](frontend/src/pages/AdminDashboard.jsx)):** Consolidated workspace for managers to create elections, add candidates, authorize voter addresses, and toggle election status.
 
 ---
 
-## 🚀 7. Execution & Setup Instructions
+## 🚀 5. Execution & Setup Instructions
 
-### 📥 7.1. Installation
-To install the dependencies for both directories, run the following commands:
+Follow these step-by-step instructions to compile, test, deploy, and execute the complete VoteChain workspace locally.
+
+### 📋 Prerequisites
+Make sure you have the following installed on your machine:
+*   [Node.js](https://nodejs.org/) (v18.x or later)
+*   [MetaMask Browser Extension](https://metamask.io/)
+
+---
+
+### 📥 5.1. Installation
+
+Navigate to each workspace folder to install required dependencies:
 
 ```powershell
-# Install Smart Contract dependencies
+# 1. Clone/Open the project directory
+# 2. Install Smart Contract Environment dependencies
 cd "smart contract"
 npm install
 
-# Install Frontend dependencies
+# 3. Install Frontend Application dependencies
 cd ../frontend
 npm install
 ```
 
-### ⚙️ 7.2. Environment Setup
-Configure your environment variables in both directories:
-*   **Smart Contract Configuration:** Copy [smart contract/.env.example](file:///d:/WorkSpace/Project/E%20voting%20sytem/smart%20contract/.env.example) to `.env` and fill in your keys:
+---
+
+### ⚙️ 5.2. Environment Configuration
+
+Copy the example environment configurations and edit with your custom variables:
+
+1.  **Smart Contract Configuration:**
+    *   Duplicate `smart contract/.env.example` as `smart contract/.env`.
+    *   Set your Alchemy Sepolia Testnet nodes and developer keys (optional for local deployments):
     ```env
     ALCHEMY_API_URL="https://eth-sepolia.g.alchemy.com/v2/YOUR_API_KEY"
     PRIVATE_KEY="YOUR_WALLET_PRIVATE_KEY"
     ETHERSCAN_API_KEY="YOUR_ETHERSCAN_API_KEY"
     ```
-*   **Frontend Configuration:** Copy [frontend/.env.example](file:///d:/WorkSpace/Project/E%20voting%20sytem/frontend/.env.example) to `.env` and add the deployed contract address:
+
+2.  **Frontend Configuration:**
+    *   Duplicate `frontend/.env.example` as `frontend/.env`.
+    *   Set the deployed target contract address:
     ```env
-    VITE_CONTRACT_ADDRESS="YOUR_DEPLOYED_CONTRACT_ADDRESS"
+    VITE_CONTRACT_ADDRESS="0xYourDeployedContractAddress"
     ```
 
-### 🛰️ 7.3. Deployment
+---
 
-#### 🖥️ Local Network Deployment
-1. Start the Hardhat Node:
-   ```powershell
-   cd "smart contract"
-   npx hardhat node
-   ```
-2. In a new terminal window, deploy the contract locally:
-   ```powershell
-   cd "smart contract"
-   npx hardhat run scripts/deploy.js --network localhost
-   ```
+### 🛡️ 5.3. Compile & Run Tests
 
-#### 🌐 Sepolia Testnet Deployment
-Deploy directly to the Sepolia test network:
+Verify contract logic and verify that all test assertions pass using Hardhat:
+
+```powershell
+cd "smart contract"
+
+# Compile Solidity source files
+npx hardhat compile
+
+# Run tests and verify coverage assertions
+npx hardhat test
+```
+
+---
+
+### 🛰️ 5.4. Local Node Deployment & MetaMask Setup
+
+To test the application locally with multiple accounts, follow these instructions:
+
+#### Step 1: Start the Local Hardhat Chain
+Start a local EVM node that hosts 20 mock accounts pre-funded with 10,000 test ETH:
+```powershell
+cd "smart contract"
+npx hardhat node
+```
+*Keep this terminal window open.* Hardhat will print the private keys of the mock accounts.
+
+#### Step 2: Configure MetaMask to Localhost
+1. Open the MetaMask extension.
+2. Open the Network dropdown and select **Add Network** -> **Add a network manually**.
+3. Fill in the parameters:
+   *   **Network Name:** Hardhat Localhost
+   *   **RPC URL:** `http://127.0.0.1:8545`
+   *   **Chain ID:** `31337`
+   *   **Currency Symbol:** `ETH`
+4. Click **Save** and switch to the new network.
+
+#### Step 3: Import Hardhat Accounts
+1. Copy the private key of Account #0 (Deployer/Admin) from the Hardhat terminal.
+2. In MetaMask, click on your Account Profile -> **Import Account**.
+3. Paste the private key and rename the imported account to **VoteChain Admin**.
+4. Import another private key (e.g., Account #1) and name it **Voter 1** to test casting ballots.
+
+#### Step 4: Deploy the Contract
+In a new terminal window, deploy the smart contract to the local test chain:
+```powershell
+cd "smart contract"
+npx hardhat run scripts/deploy.js --network localhost
+```
+Copy the contract address printed in the terminal (e.g., `0x5FbDB2315678afecb367f032d93F642f64180aa3`) and paste it as `VITE_CONTRACT_ADDRESS` inside [frontend/.env](file:///d:/WorkSpace/Project/E%20voting%20sytem/frontend/.env).
+
+---
+
+### 🌐 5.5. Sepolia Testnet Deployment (Alternative)
+
+Deploy the smart contract directly onto the Sepolia test network using the configured variables in your `.env` file:
+
 ```powershell
 cd "smart contract"
 npx hardhat run scripts/deploy.js --network sepolia
 ```
 
-### 💻 7.4. Running the Frontend
-Start the local Vite development server:
+---
+
+### 💻 5.6. Start the Web Frontend
+
+Start the Vite development web server to launch the frontend:
+
 ```powershell
 cd frontend
 npm run dev
 ```
 
+Open `http://localhost:5173` in your browser. Connect MetaMask with your imported accounts to start running elections, registering voters, and casting votes.
+
 ---
 
-## 🏁 8. Conclusion
-**VoteChain** addresses the inefficiencies of conventional voting systems by substituting them with a transparent, cost-efficient, and secure blockchain framework. By integrating smart contracts, voter registration verification, and decentralized consensus:
-*   Physical paper audit trails are replaced with immutable cryptographic records.
-*   Administrative overheads are minimized.
-*   Voter trust is fortified by guaranteeing that every cast vote is counted accurately.
+## 🔒 6. Security Features & Precautions
 
-For national-scale deployments, future optimizations will involve adding **Zero-Knowledge Proofs (ZKPs)** to further hide voter choice details while proving validity, and implementing sidechains to manage massive transaction volumes.
+*   **Reentrancy Guard:** The contract uses OpenZeppelin's `nonReentrant` modifier on state-changing user functions to block external reentrant callback attacks.
+*   **Emergency Pause:** Admins can trigger `pause()` to freeze all vote submissions during critical vulnerabilities.
+*   **Admin Isolation:** Functions affecting core state are protected by the `onlyRole(ELECTION_MANAGER_ROLE)` modifier to prevent unauthorized modifications.
+*   **Input Cleansing:** Validates time constraints and non-empty parameters to prevent garbage blockchain registrations.
