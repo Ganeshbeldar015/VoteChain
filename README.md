@@ -1,6 +1,8 @@
 # VoteChain: Secure & Decentralized E-Voting System
 
-![VoteChain Banner](frontend/src/assets/votechain_banner.png)
+<p align="center">
+  <img src="frontend/src/assets/votechain_banner.png" alt="VoteChain Banner" width="100%" />
+</p>
 
 Welcome to **VoteChain**, an advanced, secure, and transparent electronic voting system built on decentralized blockchain technology. This repository hosts a complete decentralized application (dApp) containing Ethereum-based smart contracts and a premium React-Vite web frontend.
 
